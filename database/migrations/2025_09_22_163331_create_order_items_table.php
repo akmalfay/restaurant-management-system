@@ -11,11 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('staff', function (Blueprint $table) {
+        Schema::create('order_items', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->enum('position', ['waiter', 'chef', 'manager','cashier'])->default('waiter');
-            $table->enum('active')->default(true);
+            $table->foreignId('order_id')->constrained('orders')->onDelete('cascade');
+            $table->foreignId('menu_id')->constrained('menu_items')->onDelete('cascade');
+            $table->integer('quantity')->default(1);
+            $table->decimal('price', 10, 2);
         });
     }
 
@@ -24,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('staff');
+        Schema::dropIfExists('order_items');
     }
 };
