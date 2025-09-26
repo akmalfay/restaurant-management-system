@@ -2,8 +2,11 @@
 
 namespace Database\Seeders;
 
+use App\Models\LoyaltyPoint;
+use App\Models\Order;
+use App\Models\OrderItem;
+use App\Models\StockMovement;
 use App\Models\User;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -13,11 +16,19 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+        $this->call([
+            CustomerSeeder::class,
+            TableSeeder::class,
+            StaffSeeder::class,
+            ScheduleSeeder::class,
+            CategorySeeder::class,
+            InventorySeeder::class,
+            StockMovementSeeder::class,
+            MenuItemSeeder::class,
+            RecipeIngredientSeeder::class,
+            OrderSeeder::class,
+            OrderItemSeeder::class,
+            LoyaltyPointSeeder::class,
         ]);
     }
 }

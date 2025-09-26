@@ -6,9 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class Schedule extends Model
 {
-    protected $fillable = ['staff_id','date','start_time','end_time','shift'];
+    protected $fillable = ["staff_id", "date", "shift"];
 
-    public function staff(){
-      return $this->belongsTo(Staff::class, 'staff_id');
+    public function staff()
+    {
+        return $this->belongsTo(Staff::class, "staff_id");
     }
 }

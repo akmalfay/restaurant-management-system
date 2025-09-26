@@ -4,20 +4,21 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
     public function up(): void
     {
-        Schema::create('stock_movements', function (Blueprint $table) {
+        Schema::create("stock_movements", function (Blueprint $table) {
             $table->id();
-            $table->foreignId('inventory_id')->constrained('inventories')->onDelete('cascade');
-            $table->enum('type', ['purchase', 'usage', 'waste', 'adjustment']);
-            $table->integer('quantity');
-            $table->string('reference');
-            $table->timestamp('date');
+            $table
+                ->foreignId("inventory_id")
+                ->constrained("inventories")
+                ->onDelete("cascade");
+            $table->enum("type", ["purchase", "usage", "waste", "adjustment"]);
+            $table->decimal("quantity", 10, 3);
+            $table->timestamps();
         });
     }
 
@@ -26,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('stock_movements');
+        Schema::dropIfExists("stock_movements");
     }
 };

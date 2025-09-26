@@ -6,13 +6,21 @@ use Illuminate\Database\Eloquent\Model;
 
 class LoyaltyPoint extends Model
 {
-    protected $fillable = ['customer_id', 'order_id', 'points', 'type', 'date'];
+    protected $fillable = [
+        "customer_id",
+        "order_id",
+        "points",
+        "type",
+        "expires_at",
+    ];
 
-    public function customer(){
-      return $this->belongsTo(Customer::class, 'customer_id');
+    public function customer()
+    {
+        return $this->belongsTo(Customer::class, "customer_id");
     }
 
-    public function order(){
-      return $this->belongsTo(Order::class, 'order_id');
+    public function order()
+    {
+        return $this->belongsTo(Order::class, "order_id");
     }
 }
