@@ -26,9 +26,9 @@ class ScheduleSeeder extends Seeder
             $dates[] = $day;
         }
 
-        $waiters = Staff::where("role", "waiter")->take(2)->get();
-        $cashiers = Staff::where("role", "cashier")->take(2)->get();
-        $chefs = Staff::where("role", "chef")->take(6)->get();
+        $waiters = Staff::where("position", "waiter")->take(2)->get();
+        $cashiers = Staff::where("position", "cashier")->take(2)->get();
+        $chefs = Staff::where("position", "chef")->take(6)->get();
 
         $shifts = ["morning", "night"];
 

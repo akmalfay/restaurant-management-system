@@ -21,6 +21,7 @@ class DatabaseSeeder extends Seeder
             TableSeeder::class,
             StaffSeeder::class,
             ScheduleSeeder::class,
+            ReservationSeeder::class,
             CategorySeeder::class,
             InventorySeeder::class,
             StockMovementSeeder::class,
