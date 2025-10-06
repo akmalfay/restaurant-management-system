@@ -10,7 +10,7 @@ class Staff extends Model
     use HasFactory;
 
     protected $table = "staffs"; // rename table staff to staffs
-    protected $fillable = ["name", "position", "active", "phone" . "image"];
+    protected $fillable = ["name", "position", "active", "phone", "image"];
 
     public function schedules()
     {
