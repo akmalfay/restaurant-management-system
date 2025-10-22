@@ -29,7 +29,7 @@ class UserFactory extends Factory
       'email_verified_at' => now(),
       'password' => Hash::make('password'),
       'user_type' => 'customer',
-      'image' => 'profile/default.jpg',
+      'image' => "profile/profile.jpg",
     ];
   }
 

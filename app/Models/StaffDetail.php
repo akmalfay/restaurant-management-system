@@ -14,6 +14,12 @@ class StaffDetail extends Model
     'role',
   ];
 
+  protected $casts = [
+    'joined_at' => 'datetime',
+    'left_at' => 'datetime',
+    'is_active' => 'boolean',
+  ];
+
   public function user()
   {
     return $this->belongsTo(User::class, 'user_id');

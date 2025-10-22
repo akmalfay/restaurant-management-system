@@ -21,7 +21,8 @@ class User extends Authenticatable
     'name',
     'email',
     'password',
-    'image'
+    'image',
+    'user_type',
   ];
 
   /**
@@ -32,7 +33,6 @@ class User extends Authenticatable
   protected $hidden = [
     'password',
     'remember_token',
-    'user_type',
   ];
 
   /**
@@ -50,11 +50,11 @@ class User extends Authenticatable
 
   public function customerDetail()
   {
-    return $this->belongsTo(CustomerDetail::class, 'user_id');
+    return $this->hasOne(CustomerDetail::class);
   }
 
   public function staffDetail()
   {
-    return $this->belongsTo(StaffDetail::class, 'user_id');
+    return $this->hasOne(StaffDetail::class);
   }
 }
