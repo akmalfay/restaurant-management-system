@@ -20,6 +20,10 @@ return new class extends Migration
         ->onDelete('cascade');
       $table->enum('type', ['purchase', 'usage', 'waste', 'adjustment']);
       $table->decimal('quantity', 10, 3);
+      $table->text('notes')->nullable(); // TAMBAHKAN INI
+      $table->unsignedBigInteger('batch_id')->nullable();
+      $table->index(['inventory_id']);
+      $table->index(['batch_id']);
     });
   }
 

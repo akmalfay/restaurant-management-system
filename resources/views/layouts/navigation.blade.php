@@ -1,4 +1,22 @@
 <nav x-data="{ open: false }" class="bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700">
+    @php
+    $defaultAvatar = 'https://ui-avatars.com/api/?name=' . urlencode(Auth::user()->name) . '&size=64&background=6366f1&color=fff';
+    $avatar = Auth::user()->image ? asset('storage/' . Auth::user()->image) : $defaultAvatar;
+
+    // Tentukan role label + warna
+    $rawRole = strtolower(Auth::user()->user_type === 'staff'
+    ? (optional(Auth::user()->staffDetail)->role ?? 'staff')
+    : Auth::user()->user_type);
+
+    $roleMap = [
+    'admin' => ['Admin', 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'],
+    'chef' => ['Chef', 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200'],
+    'waiter' => ['Waiter', 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'],
+    'cashier' => ['Cashier', 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'],
+    'customer' => ['Customer', 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'],
+    ];
+    [$roleLabel, $roleClass] = $roleMap[$rawRole] ?? ['User', 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200'];
+    @endphp
     <!-- Primary Navigation Menu -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
@@ -16,9 +34,23 @@
                         {{ __('Dashboard') }}
                     </x-nav-link>
 
-                    @if(in_array(Auth::user()->user_type, ['admin', 'staff']))
+                    @if(Auth::user()->user_type === "admin")
                     <x-nav-link :href="route('staff.index')" :active="request()->routeIs('staff.*')">
                         {{ __('Staff') }}
+                    </x-nav-link>
+                    @endif
+
+                    @if(Auth::user()->user_type === 'admin')
+                    <x-nav-link :href="route('customer.index')" :active="request()->routeIs('customer.*')">
+                        {{ __('Customer') }}
+                    </x-nav-link>
+                    @endif
+
+                    @if(in_array(Auth::user()->user_type, ['admin', 'staff']))
+                    <x-nav-link
+                        :href="route('inventory.index')"
+                        :active="request()->routeIs(['inventory.*', 'stockMovement.*'])">
+                        {{ __('Inventory') }}
                     </x-nav-link>
                     @endif
                 </div>
@@ -28,13 +60,16 @@
             <div class="hidden sm:flex sm:items-center sm:ms-6">
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">
-                        <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-300 focus:outline-none transition ease-in-out duration-150">
-                            <div>{{ Auth::user()->name }}</div>
-
-                            <div class="ms-1">
-                                <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                                </svg>
+                        <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-300 focus:outline-none transition ease-in-out duration-150 gap-3">
+                            <!-- Role -->
+                            <span class="px-2 py-0.5 text-xs font-semibold rounded-full {{ $roleClass }}">{{ $roleLabel }}</span>
+                            <!-- Avatar -->
+                            <img src="{{ $avatar }}" alt="{{ Auth::user()->name }}"
+                                class="h-10 w-10 rounded-full object-cover border border-gray-200 dark:border-gray-700"
+                                onerror="this.onerror=null;this.src='{{ $defaultAvatar }}';">
+                            <!-- Name -->
+                            <div class="font-medium text-base text-gray-800 dark:text-gray-200 truncate">
+                                {{ Auth::user()->name }}
                             </div>
                         </button>
                     </x-slot>
@@ -77,9 +112,21 @@
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
 
-            @if(in_array(Auth::user()->user_type, ['admin', 'staff']))
+            @if(Auth::user()->user_type === 'admin')
             <x-responsive-nav-link :href="route('staff.index')" :active="request()->routeIs('staff.*')">
                 {{ __('Staff') }}
+            </x-responsive-nav-link>
+
+            <x-responsive-nav-link :href="route('customer.index')" :active="request()->routeIs('customer.*')">
+                {{ __('Customer') }}
+            </x-responsive-nav-link>
+            @endif
+
+            @if(in_array(Auth::user()->user_type, ['admin', 'staff']))
+            <x-responsive-nav-link
+                :href="route('inventory.index')"
+                :active="request()->routeIs(['inventory.*', 'stockMovement.*'])">
+                {{ __('Inventory') }}
             </x-responsive-nav-link>
             @endif
         </div>
@@ -87,8 +134,19 @@
         <!-- Responsive Settings Options -->
         <div class="pt-4 pb-1 border-t border-gray-200 dark:border-gray-600">
             <div class="px-4">
-                <div class="font-medium text-base text-gray-800 dark:text-gray-200">{{ Auth::user()->name }}</div>
-                <div class="font-medium text-sm text-gray-500">{{ Auth::user()->email }}</div>
+                <div class="flex items-center gap-2">
+                    <!-- Role -->
+                    <span class="px-2 py-0.5 text-xs font-semibold rounded-full {{ $roleClass }}">{{ $roleLabel }}</span>
+                    <!-- Avatar -->
+                    <img src="{{ $avatar }}" alt="{{ Auth::user()->name }}"
+                        class="h-10 w-10 rounded-full object-cover border border-gray-200 dark:border-gray-700"
+                        onerror="this.onerror=null;this.src='{{ $defaultAvatar }}';">
+                    <!-- Name -->
+                    <div class="font-medium text-base text-gray-800 dark:text-gray-200 truncate">
+                        {{ Auth::user()->name }}
+                    </div>
+                </div>
+                <div class="mt-1 ms-14 font-medium text-sm text-gray-500">{{ Auth::user()->email }}</div>
             </div>
 
             <div class="mt-3 space-y-1">

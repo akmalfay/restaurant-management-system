@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Helpers\DataGenerator;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -30,16 +31,10 @@ class UserFactory extends Factory
       'password' => Hash::make('password'),
       'user_type' => 'customer',
       'image' => "profile/profile.jpg",
+      'phone' => '08' . fake()->numerify('##########'),
+      'date_of_birth' => DataGenerator::generateRandomDOB(),
+      'address' => DataGenerator::generateIndonesianAddress(),
     ];
-  }
-
-  public function admin(): static
-  {
-    return $this->state(
-      fn(array $attributes) => [
-        'user_type' => 'admin',
-      ],
-    );
   }
 
   public function staff(): static

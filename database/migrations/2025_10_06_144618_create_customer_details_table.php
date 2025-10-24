@@ -18,7 +18,7 @@ return new class extends Migration
         ->foreignId('user_id')
         ->constrained('users')
         ->onDelete('cascade');
-      $table->integer('points')->default(0);
+      $table->integer('points')->default(1000);
     });
   }
 

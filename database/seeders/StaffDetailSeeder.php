@@ -45,5 +45,15 @@ class StaffDetailSeeder extends Seeder
         'joined_at' => now(),
       ]);
     }
+
+    $users_testing = User::where('user_type', 'staff')->skip(10)->take(10)->get();
+    foreach ($users_testing as $user) {
+      StaffDetail::create([
+        'user_id' => $user->id,
+        'role' => 'waiter',
+        'is_active' => true,
+        'joined_at' => now(),
+      ]);
+    }
   }
 }

@@ -25,12 +25,20 @@ return new class extends Migration
         ->onDelete('cascade');
       $table->integer('points')->default(0);
       $table->enum('type', [
-        'earn',
-        'redeem',
-        'bonus',
-        'refund',
-        'adjustment',
+        'earn',           // dapat dari order
+        'redeem',         // pakai poin
+        'bonus',          // bonus ulang tahun/event
+        'refund',         // pengembalian
+        'adjustment',     // koreksi manual
+        'compensation',   // kompensasi
+        'loyalty_reward', // reward loyalitas
+        'referral',       // bonus referral
+        'promotion',      // promosi
+        'cashback',       // cashback
+        'expired',        // poin kadaluarsa
+        'penalty'         // penalti
       ]);
+      $table->text('description')->nullable();
     });
   }
 

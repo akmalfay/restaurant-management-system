@@ -43,6 +43,20 @@
                 </p>
               </div>
 
+              <div>
+                <label class="text-sm font-medium text-gray-500 dark:text-gray-400">Telepon</label>
+                <p class="text-gray-600 dark:text-gray-400 mt-1">
+                  {{ $user->phone ?? '-' }}
+                </p>
+              </div>
+
+              <div>
+                <label class="text-sm font-medium text-gray-500 dark:text-gray-400">Alamat</label>
+                <p class="text-gray-600 dark:text-gray-400 mt-1">
+                  {{ $user->address ?? '-' }}
+                </p>
+              </div>
+
               <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
                 <!-- Role -->
                 <div>
@@ -108,5 +122,23 @@
         </div>
       </div>
     </div>
+    @if(Auth::user()->user_type === 'admin')
+    <div class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700 flex gap-4 justify-between max-w-4xl mx-auto sm:px-6 lg:px-8">
+      <a href="{{ route('staff.edit', $user) }}"
+        class="px-4 py-2 bg-yellow-600 hover:bg-yellow-700 text-white font-semibold rounded-md">
+        Edit
+      </a>
+
+      <form action="{{ route('staff.destroy', $user) }}" method="POST"
+        onsubmit="return confirm('Yakin ingin menghapus staff {{ $user->name }}?')">
+        @csrf
+        @method('DELETE')
+        <button type="submit"
+          class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-md">
+          Hapus
+        </button>
+      </form>
+    </div>
+    @endif
   </div>
 </x-app-layout>

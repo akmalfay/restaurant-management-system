@@ -20,6 +20,8 @@ return new class extends Migration
       $table->enum('unit', ['kg', 'liter', 'pcs', 'pack', 'bottle']);
       $table->decimal('cost_per_unit', 12, 2)->nullable();
       $table->date('expires_at')->nullable();
+
+      $table->index(['expires_at']);
     });
   }
 

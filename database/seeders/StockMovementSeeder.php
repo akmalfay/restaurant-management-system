@@ -2,9 +2,12 @@
 
 namespace Database\Seeders;
 
-use App\Models\StockMovement;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use App\Models\StockMovement;
+use App\Models\Inventory;
+use App\Models\InventoryBatch;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class StockMovementSeeder extends Seeder
 {
@@ -13,48 +16,125 @@ class StockMovementSeeder extends Seeder
    */
   public function run(): void
   {
-    $stocks = [
-      ['inventory_id' => 1, 'type' => 'purchase', 'quantity' => 200],
-      ['inventory_id' => 1, 'type' => 'usage', 'quantity' => 150],
-      ['inventory_id' => 1, 'type' => 'waste', 'quantity' => 10],
+    DB::beginTransaction();
+    try {
+      // Ambil beberapa inventory untuk simulasi penggunaan
+      $items = [
+        'Daging Sapi' => [
+          ['type' => 'usage', 'qty' => 8.5, 'days_ago' => 25],
+          ['type' => 'usage', 'qty' => 12.75, 'days_ago' => 20],
+          ['type' => 'usage', 'qty' => 5.25, 'days_ago' => 15],
+        ],
+        'Susu Segar' => [
+          ['type' => 'usage', 'qty' => 15.5, 'days_ago' => 22],
+          ['type' => 'usage', 'qty' => 10.0, 'days_ago' => 18],
+          ['type' => 'waste', 'qty' => 2.5, 'days_ago' => 15],
+          ['type' => 'usage', 'qty' => 8.0, 'days_ago' => 10],
+        ],
+        'Tepung Terigu' => [
+          ['type' => 'usage', 'qty' => 45.0, 'days_ago' => 18],
+          ['type' => 'usage', 'qty' => 30.0, 'days_ago' => 12],
+          ['type' => 'adjustment', 'qty' => 5.0, 'days_ago' => 10],
+          ['type' => 'usage', 'qty' => 20.0, 'days_ago' => 5],
+        ],
+        'Tomat' => [
+          ['type' => 'usage', 'qty' => 8.5, 'days_ago' => 8],
+          ['type' => 'usage', 'qty' => 4.5, 'days_ago' => 3],
+        ],
+        'Daging Ayam' => [
+          ['type' => 'usage', 'qty' => 12.0, 'days_ago' => 15],
+          ['type' => 'usage', 'qty' => 8.5, 'days_ago' => 10],
+          ['type' => 'usage', 'qty' => 6.0, 'days_ago' => 5],
+        ],
+        'Kentang' => [
+          ['type' => 'usage', 'qty' => 25.0, 'days_ago' => 12],
+          ['type' => 'usage', 'qty' => 18.0, 'days_ago' => 6],
+        ],
+      ];
 
-      ['inventory_id' => 2, 'type' => 'purchase', 'quantity' => 100],
-      ['inventory_id' => 2, 'type' => 'usage', 'quantity' => 80],
-      ['inventory_id' => 2, 'type' => 'waste', 'quantity' => 5],
+      foreach ($items as $itemName => $movements) {
+        $inventory = Inventory::where('name', $itemName)->first();
 
-      ['inventory_id' => 3, 'type' => 'purchase', 'quantity' => 60],
-      ['inventory_id' => 3, 'type' => 'usage', 'quantity' => 40],
-      ['inventory_id' => 3, 'type' => 'waste', 'quantity' => 3],
+        if (!$inventory) continue;
 
-      ['inventory_id' => 4, 'type' => 'purchase', 'quantity' => 80],
-      ['inventory_id' => 4, 'type' => 'usage', 'quantity' => 60],
-      ['inventory_id' => 4, 'type' => 'waste', 'quantity' => 4],
+        foreach ($movements as $movement) {
+          // Ambil batch tertua yang masih ada stock (FIFO)
+          $batch = $inventory->batches()
+            ->where('quantity', '>', 0)
+            ->orderBy('expires_at', 'asc')
+            ->first();
 
-      ['inventory_id' => 5, 'type' => 'purchase', 'quantity' => 700],
-      ['inventory_id' => 5, 'type' => 'usage', 'quantity' => 500],
-      ['inventory_id' => 5, 'type' => 'waste', 'quantity' => 20],
+          if (!$batch) continue;
 
-      ['inventory_id' => 6, 'type' => 'purchase', 'quantity' => 30],
-      ['inventory_id' => 6, 'type' => 'usage', 'quantity' => 20],
-      ['inventory_id' => 6, 'type' => 'waste', 'quantity' => 1],
+          $createdAt = now()->subDays($movement['days_ago']);
+          $quantity = $movement['qty'];
 
-      ['inventory_id' => 7, 'type' => 'purchase', 'quantity' => 10],
-      ['inventory_id' => 7, 'type' => 'usage', 'quantity' => 6],
-      ['inventory_id' => 7, 'type' => 'waste', 'quantity' => 1],
+          // Kurangi quantity di batch
+          if ($batch->quantity >= $quantity) {
+            $batch->decrement('quantity', $quantity);
+          } else {
+            $quantity = $batch->quantity;
+            $batch->update(['quantity' => 0]);
+          }
 
-      ['inventory_id' => 8, 'type' => 'purchase', 'quantity' => 10],
-      ['inventory_id' => 8, 'type' => 'usage', 'quantity' => 6],
-      ['inventory_id' => 8, 'type' => 'waste', 'quantity' => 1],
+          // Buat movement record
+          StockMovement::create([
+            'inventory_id' => $inventory->id,
+            'batch_id' => $batch->id,
+            'type' => $movement['type'],
+            'quantity' => -$quantity, // negative untuk pengurangan
+            'notes' => $this->generateNotes($movement['type']),
+            'created_at' => $createdAt,
+            'updated_at' => $createdAt,
+          ]);
 
-      ['inventory_id' => 9, 'type' => 'purchase', 'quantity' => 20],
-      ['inventory_id' => 9, 'type' => 'usage', 'quantity' => 15],
-      ['inventory_id' => 9, 'type' => 'waste', 'quantity' => 2],
+          // Update stock di inventory
+          $inventory->decrement('stock', $quantity);
+        }
 
-      ['inventory_id' => 10, 'type' => 'purchase', 'quantity' => 25],
-      ['inventory_id' => 10, 'type' => 'usage', 'quantity' => 18],
-      ['inventory_id' => 10, 'type' => 'waste', 'quantity' => 1],
+        // Update expires_at ke batch terdekat yang masih ada
+        $nearestBatch = $inventory->batches()
+          ->where('quantity', '>', 0)
+          ->orderBy('expires_at', 'asc')
+          ->first();
+
+        if ($nearestBatch) {
+          $inventory->update(['expires_at' => $nearestBatch->expires_at]);
+        }
+      }
+
+      DB::commit();
+      $this->command->info('✓ Created stock movements successfully!');
+    } catch (\Exception $e) {
+      DB::rollBack();
+      $this->command->error("Seeding failed: " . $e->getMessage());
+      throw $e;
+    }
+  }
+
+  private function generateNotes(string $type): string
+  {
+    $notes = [
+      'usage' => [
+        'Digunakan untuk produksi menu',
+        'Pemakaian dapur',
+        'Penggunaan untuk pesanan pelanggan',
+        'Konsumsi produksi harian',
+      ],
+      'waste' => [
+        'Bahan rusak/kadaluarsa',
+        'Terbuang karena expired',
+        'Quality control - tidak layak',
+        'Kerusakan saat penyimpanan',
+      ],
+      'adjustment' => [
+        'Stock opname adjustment',
+        'Koreksi inventory',
+        'Penyesuaian stock fisik',
+        'Adjustment setelah pengecekan',
+      ],
     ];
 
-    StockMovement::insert($stocks);
+    return $notes[$type][array_rand($notes[$type])];
   }
 }

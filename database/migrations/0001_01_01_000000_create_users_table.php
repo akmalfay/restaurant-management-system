@@ -22,7 +22,10 @@ return new class extends Migration
       $table
         ->enum('user_type', ['admin', 'staff', 'customer'])
         ->default('customer');
-      $table->string('image');
+      $table->string('image')->default("profile/profile.png");
+      $table->text('address')->nullable();
+      $table->string('phone')->nullable()->unique();
+      $table->string('date_of_birth')->nullable();
     });
 
     Schema::create('password_reset_tokens', function (Blueprint $table) {

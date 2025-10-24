@@ -2,8 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -13,20 +11,42 @@ class DatabaseSeeder extends Seeder
    */
   public function run(): void
   {
+    $this->command->info('🌱 Starting database seeding...');
+
+    // 1. Users & Authentication
     $this->call([
       UserSeeder::class,
-      StaffDetailSeeder::class,
       CustomerDetailSeeder::class,
-      ScheduleSeeder::class,
+      StaffDetailSeeder::class,
+    ]);
+
+    // 2. Restaurant Setup
+    $this->call([
       CategorySeeder::class,
       MenuItemSeeder::class,
       TableSeeder::class,
+    ]);
+
+    // 3. Inventory System (URUTAN PENTING!)
+    $this->call([
+      InventorySeeder::class,         // Buat inventory dulu
+      InventoryBatchSeeder::class,    // Lalu buat batch
+      StockMovementSeeder::class,     // Terakhir movement
+    ]);
+
+    // 4. Orders & Transactions
+    $this->call([
       OrderSeeder::class,
       OrderItemSeeder::class,
-      ReservationSeeder::class,
-      LoyaltyPointSeeder::class,
-      InventorySeeder::class,
-      StockMovementSeeder::class,
     ]);
+
+    // 5. Other Features
+    $this->call([
+      ReservationSeeder::class,
+      ScheduleSeeder::class,
+      LoyaltyPointSeeder::class,
+    ]);
+
+    $this->command->info('✅ Database seeding completed successfully!');
   }
 }
