@@ -15,7 +15,8 @@ return new class extends Migration
       $table->id();
       $table->timestamps();
       $table->string('name')->unique();
-      $table->string('image');
+      $table->string('image')->nullable();
+      $table->string('description')->nullable();
       $table->decimal('price', 10, 2);
       $table->boolean('is_available')->default(true);
       $table

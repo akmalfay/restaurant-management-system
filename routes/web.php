@@ -3,6 +3,7 @@
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\LoyaltyPointController;
+use App\Http\Controllers\MenuItemController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\StaffController;
@@ -57,6 +58,17 @@ Route::middleware('auth')->group(function () {
         ->name('stock-movements.update');
     Route::delete('/stock-movements/{stockMovement}', [StockMovementController::class, 'destroy'])
         ->name('stock-movements.destroy');
+
+    // Menu Items routes (Public read, Admin/Staff write)
+    Route::get('/menu-items', [MenuItemController::class, 'index'])->name('menu-items.index');
+    Route::get('/menu-items/{menuItem}', [MenuItemController::class, 'show'])->name('menu-items.show');
+
+    // Admin & Staff only
+    Route::get('/menu-items/create', [MenuItemController::class, 'create'])->name('menu-items.create');
+    Route::post('/menu-items', [MenuItemController::class, 'store'])->name('menu-items.store');
+    Route::get('/menu-items/{menuItem}/edit', [MenuItemController::class, 'edit'])->name('menu-items.edit');
+    Route::patch('/menu-items/{menuItem}', [MenuItemController::class, 'update'])->name('menu-items.update');
+    Route::delete('/menu-items/{menuItem}', [MenuItemController::class, 'destroy'])->name('menu-items.destroy');
 });
 
 require __DIR__ . '/auth.php';

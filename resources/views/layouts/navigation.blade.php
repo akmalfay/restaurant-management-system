@@ -34,6 +34,10 @@
                         {{ __('Dashboard') }}
                     </x-nav-link>
 
+                    <x-nav-link :href="route('menu-items.index')" :active="request()->routeIs('menu-items.*')">
+                        {{ __('Menu') }}
+                    </x-nav-link>
+
                     @if(Auth::user()->user_type === "admin")
                     <x-nav-link :href="route('staff.index')" :active="request()->routeIs('staff.*')">
                         {{ __('Staff') }}
@@ -110,6 +114,10 @@
         <div class="pt-2 pb-3 space-y-1">
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                 {{ __('Dashboard') }}
+            </x-responsive-nav-link>
+
+            <x-responsive-nav-link :href="route('menu-items.index')" :active="request()->routeIs('menu-items.*')">
+                {{ __('Menu') }}
             </x-responsive-nav-link>
 
             @if(Auth::user()->user_type === 'admin')

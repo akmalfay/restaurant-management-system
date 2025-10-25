@@ -71,8 +71,6 @@ class InventoryBatchSeeder extends Seeder
             'created_at' => $createdAt,
             'updated_at' => $createdAt,
           ]);
-
-          $this->command->info("Created batch #{$batch->id} for {$inventory->name}: {$quantity} {$inventory->unit}");
         }
 
         // Update total stock di inventory
