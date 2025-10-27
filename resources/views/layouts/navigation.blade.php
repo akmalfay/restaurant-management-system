@@ -57,6 +57,22 @@
                         {{ __('Inventory') }}
                     </x-nav-link>
                     @endif
+
+                    @if(in_array(Auth::user()->user_type, ['admin','staff']))
+                    <x-nav-link :href="route('schedules.index')" :active="request()->routeIs('schedules.*')">
+                        {{ __('Schedule') }}
+                    </x-nav-link>
+                    @endif
+
+                    @if(
+                    Auth::user()->user_type === 'admin' ||
+                    (Auth::user()->user_type === 'staff' && optional(Auth::user()->staffDetail)->role === 'cashier') ||
+                    Auth::user()->user_type === 'customer'
+                    )
+                    <x-nav-link :href="route('reservations.index')" :active="request()->routeIs('reservations.*')">
+                        {{ __('Reservations') }}
+                    </x-nav-link>
+                    @endif
                 </div>
             </div>
 
@@ -135,6 +151,22 @@
                 :href="route('inventory.index')"
                 :active="request()->routeIs(['inventory.*', 'stockMovement.*'])">
                 {{ __('Inventory') }}
+            </x-responsive-nav-link>
+            @endif
+
+            @if(in_array(Auth::user()->user_type, ['admin','staff']))
+            <x-responsive-nav-link :href="route('schedules.index')" :active="request()->routeIs('schedules.*')">
+                {{ __('Schedule') }}
+            </x-responsive-nav-link>
+            @endif
+
+            @if(
+            Auth::user()->user_type === 'admin' ||
+            (Auth::user()->user_type === 'staff' && optional(Auth::user()->staffDetail)->role === 'cashier') ||
+            Auth::user()->user_type === 'customer'
+            )
+            <x-responsive-nav-link :href="route('reservations.index')" :active="request()->routeIs('reservations.*')">
+                {{ __('Reservations') }}
             </x-responsive-nav-link>
             @endif
         </div>

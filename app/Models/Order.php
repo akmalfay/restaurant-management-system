@@ -2,36 +2,42 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Order extends Model
 {
+  use HasFactory;
+
   protected $fillable = [
     'customer_id',
     'type',
     'total',
     'status',
-    'order_time',
     'points_redeemed',
+    'order_time',
   ];
 
-  public function orderItems()
-  {
-    return $this->hasMany(OrderItem::class, 'order_id');
-  }
+  protected $casts = [
+    'order_time' => 'datetime',
+    'total' => 'decimal:2',
+  ];
 
-  public function loyaltyPoints()
-  {
-    return $this->belongsTo(LoyaltyPoint::class, 'order_id');
-  }
-
-  public function customerDetail()
+  // Relasi ke CustomerDetail
+  public function customer()
   {
     return $this->belongsTo(CustomerDetail::class, 'customer_id');
   }
 
+  // Relasi ke OrderItems
+  public function orderItems()
+  {
+    return $this->hasMany(OrderItem::class);
+  }
+
+  // Relasi ke Reservation (1 order bisa punya 1 reservasi)
   public function reservation()
   {
-    return $this->belongsTo(Reservation::class, 'order_id');
+    return $this->hasOne(Reservation::class);
   }
 }

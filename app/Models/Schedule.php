@@ -8,6 +8,8 @@ class Schedule extends Model
 {
   protected $fillable = ['staff_id', 'schedule_date', 'shift'];
 
+  public $timestamps = true;
+
   public function staffDetail()
   {
     return $this->belongsTo(StaffDetail::class, 'staff_id');

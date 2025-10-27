@@ -5,6 +5,9 @@ use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\LoyaltyPointController;
 use App\Http\Controllers\MenuItemController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ReservationController;
+use App\Http\Controllers\ScheduleController;
+use App\Http\Controllers\TableController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\StaffController;
 use App\Http\Controllers\StockMovementController;
@@ -69,6 +72,25 @@ Route::middleware('auth')->group(function () {
     Route::get('/menu-items/{menuItem}/edit', [MenuItemController::class, 'edit'])->name('menu-items.edit');
     Route::patch('/menu-items/{menuItem}', [MenuItemController::class, 'update'])->name('menu-items.update');
     Route::delete('/menu-items/{menuItem}', [MenuItemController::class, 'destroy'])->name('menu-items.destroy');
+
+    Route::get('/schedules', [ScheduleController::class, 'index'])->name('schedules.index');
+    Route::get('/schedules/history', [ScheduleController::class, 'history'])->name('schedules.history');
+    Route::post('/schedules', [ScheduleController::class, 'assign'])->name('schedules.assign'); // admin only
+    Route::post('/schedules/toggle-holiday', [ScheduleController::class, 'toggleHoliday'])->name('schedules.toggleHoliday'); // admin only
+    Route::delete('/schedules/{schedule}', [ScheduleController::class, 'destroy'])->name('schedules.destroy'); // admin only
+
+    // Reservations
+    Route::get('/reservations', [ReservationController::class, 'index'])->name('reservations.index');
+    Route::post('/reservations', [ReservationController::class, 'store'])->name('reservations.store'); // customer boleh pesan
+    Route::patch('/reservations/{reservation}/approve', [ReservationController::class, 'approve'])->name('reservations.approve'); // admin/cashier
+    Route::patch('/reservations/{reservation}/complete', [ReservationController::class, 'complete'])->name('reservations.complete'); // admin/cashier
+    Route::patch('/reservations/{reservation}/cancel', [ReservationController::class, 'cancel'])->name('reservations.cancel'); // admin/cashier
+
+    // History reservasi (read-only)
+    Route::get('/reservations/history', [ReservationController::class, 'history'])->name('reservations.history');
+
+    // Rename Table (edit kategori & nomor) admin/cashier
+    Route::patch('/tables/{table}/rename', [TableController::class, 'rename'])->name('tables.rename'); // admin/cashier
 });
 
 require __DIR__ . '/auth.php';

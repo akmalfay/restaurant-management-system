@@ -22,15 +22,17 @@ return new class extends Migration
         ->foreignId('order_id')
         ->constrained('orders')
         ->onDelete('cascade');
-      $table->timestamp('reservation_time');
-      $table->integer('session');
-      $table->integer('guests');
-      $table->enum('status', [
-        'confirmed',
-        'completed',
-        'cancelled',
-        'no_show',
-      ]);
+      // Tanggal reservasi (untuk unique slot per hari + shift)
+      $table->date('reservation_date')->index();
+
+      // Tambah pending agar bisa di-ACC admin/cashier
+      $table->enum('status', ['pending', 'confirmed', 'completed', 'cancelled', 'no_show'])
+        ->default('pending')
+        ->index();
+
+      // Tambah kolom slot per jam
+      $table->time('start_time')->default('10:00:00')->after('reservation_date');
+      $table->time('end_time')->default('11:00:00')->after('start_time');
     });
   }
 

@@ -14,13 +14,15 @@ return new class extends Migration
     Schema::create('tables', function (Blueprint $table) {
       $table->id();
       $table->timestamps();
-      $table->string('name');
+      $table->string('name')->unique();
       $table->enum('status', [
         'available',
         'occupied',
         'reserved',
         'maintenance',
       ]);
+      $table->integer('capacity')->default(2);
+      $table->index('status');
     });
   }
 

@@ -20,6 +20,7 @@ return new class extends Migration
         ->onDelete('cascade');
       $table->date('schedule_date');
       $table->enum('shift', ['morning', 'night']);
+      $table->index(['schedule_date', 'shift']); // tambah index utk join/lookup cepat
     });
   }
 
