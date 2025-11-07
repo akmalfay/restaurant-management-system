@@ -198,9 +198,12 @@
                         {{ $slot->status }}
                       </div>
                     </div>
-                    @if($canManage && in_array($slot->status, ['pending','confirmed']))
+
+                    {{-- Action Buttons --}}
+                    @if($canManage)
+                    @if($slot->status === 'pending')
+                    {{-- PENDING: Approve atau Cancel --}}
                     <div class="mt-1 flex items-center justify-center gap-1">
-                      @if($slot->status === 'pending')
                       <form method="POST" action="{{ route('reservations.approve', $slot) }}">
                         @csrf @method('PATCH')
                         <button type="submit" class="p-1 rounded bg-green-600 hover:bg-green-700 text-white" title="Approve">
@@ -209,18 +212,7 @@
                           </svg>
                         </button>
                       </form>
-                      @endif
-                      @if($slot->status === 'confirmed')
-                      <form method="POST" action="{{ route('reservations.complete', $slot) }}">
-                        @csrf @method('PATCH')
-                        <button type="submit" class="p-1 rounded bg-blue-600 hover:bg-blue-700 text-white" title="Complete">
-                          <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                          </svg>
-                        </button>
-                      </form>
-                      @endif
-                      <form method="POST" action="{{ route('reservations.cancel', $slot) }}" onsubmit="return confirm('Batalkan?')">
+                      <form method="POST" action="{{ route('reservations.cancel', $slot) }}" onsubmit="return confirm('Batalkan reservasi ini?')">
                         @csrf @method('PATCH')
                         <button type="submit" class="p-1 rounded bg-red-600 hover:bg-red-700 text-white" title="Cancel">
                           <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -229,6 +221,20 @@
                         </button>
                       </form>
                     </div>
+                    @elseif($slot->status === 'confirmed')
+                    {{-- CONFIRMED: Hanya Complete --}}
+                    <div class="mt-1 flex items-center justify-center">
+                      <form method="POST" action="{{ route('reservations.complete', $slot) }}">
+                        @csrf @method('PATCH')
+                        <button type="submit" class="px-2 py-1 rounded bg-blue-600 hover:bg-blue-700 text-white text-[10px] flex items-center gap-1" title="Selesaikan Reservasi">
+                          <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                          </svg>
+                          <span>Selesai</span>
+                        </button>
+                      </form>
+                    </div>
+                    @endif
                     @endif
                     @elseif($canManage && !$isPast)
                     {{-- Form Add --}}
