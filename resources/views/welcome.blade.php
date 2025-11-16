@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>RestoMan - Cita Rasa Autentik</title>
+    <title>Restoran - Cita Rasa Autentik</title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
@@ -61,7 +61,7 @@
     <header class="sticky top-0 z-50 bg-white/80 backdrop-blur-sm shadow-sm dark:bg-gray-900/80">
         <nav class="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex justify-between items-center py-5">
             <div class="text-3xl font-bold text-amber-600 dark:text-amber-400">
-                RestoMan
+                Restoran
             </div>
             
             <!-- Navigasi Desktop -->
@@ -263,9 +263,9 @@
             <div class="flex flex-col md:flex-row justify-between items-center text-center md:text-left">
                 <div>
                     <div class="text-3xl font-bold text-amber-500 mb-2">
-                        RestoMan
+                        Restoran
                     </div>
-                    <p class="text-sm">&copy; {{ date('Y') }} RestoMan. Dibuat dengan Laravel & Tailwind CSS.</p>
+                    <p class="text-sm">&copy; {{ date('Y') }} Restoran. Dibuat dengan Laravel & Tailwind CSS.</p>
                 </div>
                 <div class="flex space-x-6 mt-8 md:mt-0">
                     <a href="#" class="hover:text-white transition-colors" aria-label="Facebook">
