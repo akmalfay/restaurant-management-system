@@ -11,6 +11,7 @@ use App\Http\Controllers\TableController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\StaffController;
 use App\Http\Controllers\StockMovementController;
+use App\Http\Controllers\OrderController; // added
 
 Route::get('/', function () {
     return view('welcome');
@@ -79,18 +80,34 @@ Route::middleware('auth')->group(function () {
     Route::post('/schedules/toggle-holiday', [ScheduleController::class, 'toggleHoliday'])->name('schedules.toggleHoliday'); // admin only
     Route::delete('/schedules/{schedule}', [ScheduleController::class, 'destroy'])->name('schedules.destroy'); // admin only
 
-    // Reservations
+    // Reservations (ensure these exist)
     Route::get('/reservations', [ReservationController::class, 'index'])->name('reservations.index');
-    Route::post('/reservations', [ReservationController::class, 'store'])->name('reservations.store'); // customer boleh pesan
-    Route::patch('/reservations/{reservation}/approve', [ReservationController::class, 'approve'])->name('reservations.approve'); // admin/cashier
-    Route::patch('/reservations/{reservation}/complete', [ReservationController::class, 'complete'])->name('reservations.complete'); // admin/cashier
-    Route::patch('/reservations/{reservation}/cancel', [ReservationController::class, 'cancel'])->name('reservations.cancel'); // admin/cashier
+    Route::post('/reservations', [ReservationController::class, 'store'])->name('reservations.store');
+    Route::patch('/reservations/{reservation}/cancel', [ReservationController::class, 'cancel'])->name('reservations.cancel');
+    Route::patch('/reservations/{reservation}/complete', [ReservationController::class, 'complete'])->name('reservations.complete');
+    Route::get('/reservations/history', [ReservationController::class, 'history'])->name('reservations.history');
+
+    // Table-level status toggles (admin/cashier)
+    Route::patch('/tables/{table}/maintenance', [TableController::class, 'setMaintenance'])->name('tables.maintenance');
+    Route::patch('/tables/{table}/available', [TableController::class, 'setAvailable'])->name('tables.available');
+
+    // New routes to manage maintenance notice / delete affected reservations
+    Route::post('/tables/maintenance/delete-affected', [TableController::class, 'deleteAffectedReservations'])->name('tables.maintenance.delete');
+    Route::post('/tables/maintenance/clear-notice', [TableController::class, 'clearMaintenanceNotice'])->name('tables.maintenance.clear');
+
+    // Grid view for tables
+    Route::get('/tables', [TableController::class, 'index'])->name('tables.grid');
 
     // History reservasi (read-only)
     Route::get('/reservations/history', [ReservationController::class, 'history'])->name('reservations.history');
 
     // Rename Table (edit kategori & nomor) admin/cashier
     Route::patch('/tables/{table}/rename', [TableController::class, 'rename'])->name('tables.rename'); // admin/cashier
+
+    // Orders management (Admin & Cashier)
+    Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
+    Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show'); // returns JSON for popover
+    Route::patch('/orders/{order}/status', [OrderController::class, 'updateStatus'])->name('orders.updateStatus');
 });
 
 require __DIR__ . '/auth.php';

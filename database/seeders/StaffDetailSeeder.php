@@ -4,7 +4,6 @@ namespace Database\Seeders;
 
 use App\Models\StaffDetail;
 use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class StaffDetailSeeder extends Seeder
@@ -14,46 +13,39 @@ class StaffDetailSeeder extends Seeder
    */
   public function run(): void
   {
-    $users = User::where('user_type', 'staff')->get();
+    $users = User::where('user_type', 'staff')->orderBy('id')->get();
+    if ($users->isEmpty()) {
+      $this->command->warn('StaffDetailSeeder: tidak ada staff.');
+      return;
+    }
+
+    // assign roles safely according to availability
     $chefs = $users->slice(0, 6);
     $cashiers = $users->slice(6, 2);
-    $waiters = $users->slice(8, 2);
+    $waiters = $users->slice(8);
 
     foreach ($chefs as $user) {
-      StaffDetail::create([
-        'user_id' => $user->id,
-        'role' => 'chef',
-        'is_active' => true,
-        'joined_at' => now(),
-      ]);
+      StaffDetail::firstOrCreate(
+        ['user_id' => $user->id],
+        ['role' => 'chef', 'is_active' => true, 'joined_at' => now()]
+      );
     }
 
     foreach ($cashiers as $user) {
-      StaffDetail::create([
-        'user_id' => $user->id,
-        'role' => 'cashier',
-        'is_active' => true,
-        'joined_at' => now(),
-      ]);
+      StaffDetail::firstOrCreate(
+        ['user_id' => $user->id],
+        ['role' => 'cashier', 'is_active' => true, 'joined_at' => now()]
+      );
     }
 
     foreach ($waiters as $user) {
-      StaffDetail::create([
-        'user_id' => $user->id,
-        'role' => 'waiter',
-        'is_active' => true,
-        'joined_at' => now(),
-      ]);
+      // remaining staff default to waiter
+      StaffDetail::firstOrCreate(
+        ['user_id' => $user->id],
+        ['role' => 'waiter', 'is_active' => true, 'joined_at' => now()]
+      );
     }
 
-    $users_testing = User::where('user_type', 'staff')->skip(10)->take(10)->get();
-    foreach ($users_testing as $user) {
-      StaffDetail::create([
-        'user_id' => $user->id,
-        'role' => 'waiter',
-        'is_active' => true,
-        'joined_at' => now(),
-      ]);
-    }
+    $this->command->info('✓ StaffDetailSeeder: staff roles assigned (safe).');
   }
 }

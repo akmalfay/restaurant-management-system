@@ -10,7 +10,7 @@
     </div>
   </x-slot>
 
-  <div class="py-8">
+  <div class="py-8 text-gray-800 dark:text-gray-200">
     <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
 
       @if(session('status'))
@@ -171,7 +171,7 @@
                   <td class="border border-gray-300 dark:border-gray-700 px-4 py-3 font-medium text-sm">
                     <div class="flex items-center gap-2">
                       <span>🌅</span>
-                      <span>Morning</span>
+                      <span>Pagi</span>
                     </div>
                   </td>
                   @foreach($nextWeek as $day)
@@ -220,7 +220,7 @@
                   <td class="border border-gray-300 dark:border-gray-700 px-4 py-3 font-medium text-sm">
                     <div class="flex items-center gap-2">
                       <span>🌙</span>
-                      <span>Night</span>
+                      <span>Malam</span>
                     </div>
                   </td>
                   @foreach($nextWeek as $day)

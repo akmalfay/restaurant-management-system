@@ -21,13 +21,13 @@ return new class extends Migration
         ->onDelete('cascade');
       $table->enum('type', ['dine_in', 'takeway', 'delivery']);
       $table->decimal('total', 12, 2);
+      // status: include cancel
       $table
         ->enum('status', [
           'pending',
           'preparing',
           'ready',
-          'served',
-          'completed',
+          'cancel',
         ])
         ->default('pending');
       $table->integer('points_redeemed')->nullable();

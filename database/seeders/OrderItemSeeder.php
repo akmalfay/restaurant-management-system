@@ -5,7 +5,6 @@ namespace Database\Seeders;
 use App\Models\MenuItem;
 use App\Models\Order;
 use App\Models\OrderItem;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class OrderItemSeeder extends Seeder
@@ -17,44 +16,36 @@ class OrderItemSeeder extends Seeder
   {
     $menuItems = MenuItem::all();
     $orders = Order::all();
-
-    $orderItems = [];
-
-    // 4 order buy 1 item
-    for ($i = 0; $i < 4; $i++) {
-      $orderItems[] = [
-        'order_id' => $orders[$i]->id,
-        'menu_id' => $menuItems[$i]->id,
-        'quantity' => 1,
-        'price' => $menuItems[$i]->price,
-      ];
+    if ($menuItems->isEmpty() || $orders->isEmpty()) {
+      $this->command->warn('OrderItemSeeder: menuItems or orders missing');
+      return;
     }
 
-    // 1 order buy 3 items
-    for ($i = 0; $i < 3; $i++) {
-      $orderItems[] = [
-        'order_id' => 5,
-        'menu_id' => $menuItems[$i]->id,
-        'quantity' => 1,
-        'price' => $menuItems[$i]->price * ($i + 1),
-      ];
-    }
-
-    OrderItem::insert($orderItems);
-
-    // Update total price order
+    $items = [];
     foreach ($orders as $order) {
-      $totalPrice = 0;
-
-      foreach ($orderItems as $orderItem) {
-        if ($orderItem['order_id'] === $order->id) {
-          $totalPrice += $orderItem['price'];
-        }
+      $count = random_int(1, 5);
+      $total = 0;
+      $picked = $menuItems->shuffle()->take($count);
+      foreach ($picked as $mi) {
+        $qty = random_int(1, 3);
+        $price = $mi->price;
+        $items[] = [
+          'order_id' => $order->id,
+          'menu_id' => $mi->id,
+          'quantity' => $qty,
+          'price' => $price * $qty,
+          'created_at' => now(),
+          'updated_at' => now(),
+        ];
+        $total += $price * $qty;
       }
-
-      Order::where('id', $order->id)->update([
-        'total' => $totalPrice,
-      ]);
+      Order::where('id', $order->id)->update(['total' => $total]);
     }
+
+    // bulk insert
+    $chunks = array_chunk($items, 500);
+    foreach ($chunks as $c) OrderItem::insert($c);
+
+    $this->command->info('✓ OrderItemSeeder: inserted items for orders');
   }
 }
