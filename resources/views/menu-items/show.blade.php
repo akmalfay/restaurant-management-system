@@ -81,6 +81,28 @@
                 </span>
                 @endif
               </div>
+              
+      @auth
+          @if(Auth::user()->user_type === 'customer') 
+          
+              <form action="{{ route('cart.add', $menuItem->id) }}" method="POST" class="mt-4">
+                  @csrf
+                  <div class="d-flex align-items-center gap-3 flex-wrap">
+                      <div style="width: 80px;">
+                          <input type="number" name="quantity" value="1" min="1" 
+                                class="form-control text-center border-secondary" 
+                                style="height: 50px; font-weight: bold;">
+                      </div>
+
+                      <button type="submit" class="btn btn-success btn-lg px-4 shadow" 
+                              style="height: 50px; border-radius: 50px; font-weight: 600;">
+                          <i class="fas fa-shopping-cart me-2"></i> Beli Sekarang
+                      </button>
+                  </div>
+              </form>
+
+          @endif
+      @endauth
 
               {{-- Action Buttons (Admin/Staff only) --}}
               @if(Auth::check() && in_array(Auth::user()->user_type, ['admin', 'staff']))
