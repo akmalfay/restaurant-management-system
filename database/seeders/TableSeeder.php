@@ -21,13 +21,10 @@ class TableSeeder extends Seeder
 
     $tables = [];
 
-    // Status distribution: available 70%, reserved 15%, occupied 10%, maintenance 5%
+    // Status distribution: available majority, maintenance small percent
     $weightedStatus = function () {
       $r = random_int(1, 100);
-      if ($r <= 70) return 'available';
-      if ($r <= 85) return 'reserved';
-      if ($r <= 95) return 'occupied';
-      return 'maintenance';
+      return $r <= 88 ? 'available' : 'maintenance';
     };
 
     foreach ($categories as $prefix => $config) {
@@ -45,10 +42,6 @@ class TableSeeder extends Seeder
     Table::truncate();
     Table::insert($tables);
 
-    $this->command->info('✓ TableSeeder: 40 meja dibuat');
-    $this->command->info('  • VIP: 10 meja (4 kursi)');
-    $this->command->info('  • Terrace: 10 meja (4 kursi)');
-    $this->command->info('  • Outdoor: 10 meja (3 kursi)');
-    $this->command->info('  • Indoor: 10 meja (2 kursi)');
+    $this->command->info('✓ TableSeeder: meja dibuat dengan kapasitas & status (available/maintenance)');
   }
 }

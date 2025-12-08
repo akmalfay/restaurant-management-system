@@ -75,12 +75,26 @@
               </div>
               <div class="flex items-center justify-between text-xs">
                 <span class="text-gray-500 dark:text-gray-400">Tamu:</span>
-                <span class="text-gray-800 dark:text-gray-200">{{ $r->guests }}</span>
+                <span class="text-gray-800 dark:text-gray-200">{{ $r->guests ?? '-' }}</span>
               </div>
               <div class="flex items-center justify-between text-xs">
                 <span class="text-gray-500 dark:text-gray-400">Order ID:</span>
                 <span class="text-gray-800 dark:text-gray-200">#{{ $r->order_id }}</span>
               </div>
+
+              {{-- Jika user owner atau admin/cashier tampilkan tombol batal --}}
+              @php $currentUserId = auth()->id(); @endphp
+              @php $isOwner = optional($r->order)->customer_id === $currentUserId; @endphp
+
+              @if(($canManage || ($user->user_type==='customer' && $isOwner)) && in_array($r->status, ['pending','confirmed']))
+              <div class="mt-3 flex items-center gap-2">
+                <form method="POST" action="{{ route('reservations.cancel', ['reservation' => $r->id]) }}">
+                  @csrf @method('PATCH')
+                  <button type="submit" class="px-3 py-1 rounded bg-red-600 hover:bg-red-700 text-white text-xs">Batalkan</button>
+                </form>
+              </div>
+              @endif
+
             </div>
             @else
             <div class="text-xs text-gray-400 dark:text-gray-500">Tidak ada reservasi</div>

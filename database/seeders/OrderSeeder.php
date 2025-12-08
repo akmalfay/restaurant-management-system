@@ -4,7 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\CustomerDetail;
 use App\Models\Order;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 
 class OrderSeeder extends Seeder
@@ -14,45 +14,35 @@ class OrderSeeder extends Seeder
    */
   public function run(): void
   {
-    $ordersDineIn = CustomerDetail::take(3)->get();
-    $ordersTakeway = CustomerDetail::skip(3)->take(3)->get();
+    $customers = CustomerDetail::all();
+    $types = ['dine_in', 'takeway', 'delivery'];
+    // include cancel (rare)
+    $statuses = ['pending', 'preparing', 'ready', 'cancel'];
 
     $orders = [];
 
-    // dine-in
-    foreach ($ordersDineIn as $order) {
-      $orders[] = [
-        'customer_id' => $order->id,
-        'type' => 'dine_in',
-        'total' => 0,
-        'order_time' => now()->addMinutes(10),
-        'points_redeemed' => 0,
-        'status' => 'ready',
-      ];
-    }
+    // create 120 orders across past 10 days and next 3 days
+    $now = Carbon::now();
+    for ($i = 0; $i < 120; $i++) {
+      $date = $now->copy()->subDays(random_int(0, 7))->addHours(random_int(-24, 48));
+      $cust = random_int(1, 100) <= 70 ? $customers->random() : null; // 70% assigned customers
 
-    foreach ($ordersTakeway as $order) {
-      $orders[] = [
-        'customer_id' => $order->id,
-        'type' => 'delivery',
-        'total' => 0,
-        'order_time' => now()->addMinutes(),
-        'points_redeemed' => 0,
-        'status' => 'preparing',
-      ];
-    }
+      // make cancel relatively uncommon (~6%)
+      $status = (random_int(1, 100) <= 6) ? 'cancel' : $statuses[array_rand(['pending', 'preparing', 'ready'])];
 
-    for ($i = 0; $i < 3; $i++) {
       $orders[] = [
-        'customer_id' => null,
-        'type' => 'takeway',
+        'customer_id' => $cust ? $cust->id : null,
+        'type' => $types[array_rand($types)],
         'total' => 0,
-        'order_time' => now(),
-        'points_redeemed' => 0,
-        'status' => 'pending',
+        'status' => $status,
+        'points_redeemed' => null,
+        'order_time' => $date,
+        'created_at' => $date,
+        'updated_at' => $date,
       ];
     }
 
     Order::insert($orders);
+    $this->command->info('✓ OrderSeeder: created ' . count($orders) . ' orders');
   }
 }
