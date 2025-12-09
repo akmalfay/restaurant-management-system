@@ -55,13 +55,14 @@
                 </a>
             </li>
 
-            {{-- Cart --}}
+            @if(Auth::user()->user_type === 'customer')
             <li>
                 <a href="{{ route('cart.index') }}"
-                   class="flex items-center gap-3 px-4 py-3 rounded-lg transition {{ isActive('cart.*') }}">
+                class="flex items-center gap-3 px-4 py-3 rounded-lg transition {{ isActive('cart.*') }}">
                     <span class="material-icons text-lg">keranjang</span>
                 </a>
             </li>
+            @endif
 
             {{-- Tracking (Customer only) --}}
             @if(Auth::user()->user_type === 'customer')
