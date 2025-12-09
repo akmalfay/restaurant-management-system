@@ -52,7 +52,7 @@
         <!-- Scripts (Vite) - Dibiarkan untuk jika Anda beralih kembali -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="font-sans antialiased">
+    <body class="font-sans bg-[#F7F4ED] antialiased">
         {{-- Mengganti latar belakang agar seragam dengan landing page --}}
         <div class="flex min-h-screen">
 
