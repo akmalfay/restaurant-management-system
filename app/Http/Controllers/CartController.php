@@ -119,6 +119,7 @@ class CartController extends Controller
                 'type' => $request->type,     // dine_in, takeaway, delivery
                 'status' => 'pending',        // Default status awal
                 'total' => $totalAmount,
+                'order_time' => now(),
                 'created_at' => now(),
             ]);
 
@@ -126,7 +127,7 @@ class CartController extends Controller
             foreach($cart as $id => $details) {
                 OrderItem::create([
                     'order_id' => $order->id,
-                    'menu_item_id' => $id, 
+                    'menu_id' => $id,
                     'quantity' => $details['quantity'],
                     'price' => $details['price'], // Harga saat transaksi terjadi
                 ]);
