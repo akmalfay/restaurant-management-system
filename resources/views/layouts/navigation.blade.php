@@ -1,4 +1,4 @@
-<nav x-data="{ open: false }" class="bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700">
+<nav x-data="{ open: false }" class="h-full flex flex-col justify-between bg-[#0F3D3E] text-white">
     @php
     $defaultAvatar = 'https://ui-avatars.com/api/?name=' . urlencode(Auth::user()->name) . '&size=64&background=6366f1&color=fff';
     $avatar = Auth::user()->image ? asset('storage/' . Auth::user()->image) : $defaultAvatar;
@@ -17,187 +17,136 @@
     [$roleLabel, $roleClass] = $roleMap[$rawRole] ?? ['User', 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200'];
     @endphp
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between h-16">
-            <div class="flex">
-                <div class="shrink-0 flex items-center">
-                    <a href="{{ route('dashboard') }}">
-                        <x-application-logo class="block h-9 w-auto fill-current text-gray-800 dark:text-gray-200" />
-                    </a>
-                </div>
-
-                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                        {{ __('Dashboard') }}
-                    </x-nav-link>
-
-                    <x-nav-link :href="route('menu-items.index')" :active="request()->routeIs('menu-items.*')">
-                        {{ __('Menu') }}
-                    </x-nav-link>
-
-                    @if(Auth::user()->user_type === "admin")
-                    <x-nav-link :href="route('staff.index')" :active="request()->routeIs('staff.*')">
-                        {{ __('Staff') }}
-                    </x-nav-link>
-                    @endif
-
-                    @if(Auth::user()->user_type === 'admin')
-                    <x-nav-link :href="route('customer.index')" :active="request()->routeIs('customer.*')">
-                        {{ __('Customer') }}
-                    </x-nav-link>
-                    @endif
-
-                    @if(in_array(Auth::user()->user_type, ['admin', 'staff']))
-                    <x-nav-link :href="route('inventory.index')" :active="request()->routeIs(['inventory.*', 'stockMovement.*'])">
-                        {{ __('Inventory') }}
-                    </x-nav-link>
-                    @endif
-
-                    @if(in_array(Auth::user()->user_type, ['admin','staff']))
-                    <x-nav-link :href="route('schedules.index')" :active="request()->routeIs('schedules.*')">
-                        {{ __('Schedule') }}
-                    </x-nav-link>
-                    @endif
-
-                    @if(
-                    Auth::user()->user_type === 'admin' ||
-                    (Auth::user()->user_type === 'staff' && optional(Auth::user()->staffDetail)->role === 'cashier') ||
-                    Auth::user()->user_type === 'customer'
-                    )
-                    <x-nav-link :href="route('reservations.index')" :active="request()->routeIs('reservations.*')">
-                        {{ __('Reservations') }}
-                    </x-nav-link>
-                    @endif
-
-                    @if(
-                    Auth::user()->user_type === 'admin' ||
-                    (Auth::user()->user_type === 'staff' && optional(Auth::user()->staffDetail)->role === 'cashier')
-                    )
-                    <x-nav-link :href="route('tables.grid')" :active="request()->routeIs('tables.*')">
-                        {{ __('Tables') }}
-                    </x-nav-link>
-                    <x-nav-link :href="route('orders.index')" :active="request()->routeIs('orders.*')">
-                        {{ __('Orders') }}
-                    </x-nav-link>
-                    @endif
-                </div>
-            </div>
-
-            <div class="hidden sm:flex sm:items-center sm:ms-6">
-                <x-dropdown align="right" width="48">
-                    <x-slot name="trigger">
-                        <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-300 focus:outline-none transition ease-in-out duration-150 gap-3">
-                            <span class="px-2 py-0.5 text-xs font-semibold rounded-full {{ $roleClass }}">{{ $roleLabel }}</span>
-                            <img src="{{ $avatar }}" alt="{{ Auth::user()->name }}" class="h-10 w-10 rounded-full object-cover border border-gray-200 dark:border-gray-700" onerror="this.onerror=null;this.src='{{ $defaultAvatar }}';">
-                            <div class="font-medium text-base text-gray-800 dark:text-gray-200 truncate">
-                                {{ Auth::user()->name }}
-                            </div>
-                        </button>
-                    </x-slot>
-
-                    <x-slot name="content">
-                        <x-dropdown-link :href="route('profile.edit')">
-                            {{ __('Profile') }}
-                        </x-dropdown-link>
-
-                        <form method="POST" action="{{ route('logout') }}">
-                            @csrf
-                            <x-dropdown-link :href="route('logout')" onclick="event.preventDefault(); this.closest('form').submit();">
-                                {{ __('Log Out') }}
-                            </x-dropdown-link>
-                        </form>
-                    </x-slot>
-                </x-dropdown>
-            </div>
-
-            <div class="-me-2 flex items-center sm:hidden">
-                <button @click="open = ! open" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 dark:text-gray-500 hover:text-gray-500 dark:hover:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-900 focus:outline-none focus:bg-gray-100 dark:focus:bg-gray-900 focus:text-gray-500 dark:focus:text-gray-400 transition duration-150 ease-in-out">
-                    <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
-                        <path :class="{'hidden': open, 'inline-flex': ! open }" class="inline-flex" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                        <path :class="{'hidden': ! open, 'inline-flex': open }" class="hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </button>
-            </div>
+    {{-- TOP SECTION --}}
+    <div>
+        {{-- Logo --}}
+        <div class="px-6 py-6">
+            <a href="{{ route('dashboard') }}" class="flex items-center gap-3">
+                <x-application-logo class="h-10 w-auto fill-current text-white" />
+                <span class="text-lg font-semibold tracking-wide">
+                    {{ config('app.name', 'App') }}
+                </span>
+            </a>
         </div>
+
+        {{-- MENU LIST --}}
+        <ul class="mt-4 space-y-1 px-4">
+
+            {{-- Helper to detect active --}}
+            @php
+                function isActive($route) {
+                    return request()->routeIs($route) ? 'bg-white/10 text-white' : 'text-white/80 hover:bg-white/10 hover:text-white';
+                }
+            @endphp
+
+            {{-- Dashboard --}}
+            <li>
+                <a href="{{ route('dashboard') }}"
+                   class="flex items-center gap-3 px-4 py-3 rounded-lg transition {{ isActive('dashboard') }}">
+                    <span class="material-icons text-lg">Dashboard</span>
+                </a>
+            </li>
+
+            {{-- Menu Items --}}
+            <li>
+                <a href="{{ route('menu-items.index') }}"
+                   class="flex items-center gap-3 px-4 py-3 rounded-lg transition {{ isActive('menu-items.*') }}">
+                    <span class="material-icons text-lg">Menu</span>
+                </a>
+            </li>
+
+            {{-- Staff (Admin only) --}}
+            @if(Auth::user()->user_type === "admin")
+            <li>
+                <a href="{{ route('staff.index') }}"
+                   class="flex items-center gap-3 px-4 py-3 rounded-lg transition {{ isActive('staff.*') }}">
+                    <span class="material-icons text-lg">Staff</span>
+                </a>
+            </li>
+            @endif
+
+            {{-- Customer (Admin only) --}}
+            @if(Auth::user()->user_type === "admin")
+            <li>
+                <a href="{{ route('customer.index') }}"
+                   class="flex items-center gap-3 px-4 py-3 rounded-lg transition {{ isActive('customer.*') }}">
+                    <span class="material-icons text-lg">Customer</span>
+                </a>
+            </li>
+            @endif
+
+            {{-- Inventory --}}
+            @if(in_array(Auth::user()->user_type, ['admin', 'staff']))
+            <li>
+                <a href="{{ route('inventory.index') }}"
+                   class="flex items-center gap-3 px-4 py-3 rounded-lg transition {{ isActive(['inventory.*','stockMovement.*']) }}">
+                    <span class="material-icons text-lg">Inventory</span>
+                </a>
+            </li>
+            @endif
+
+            {{-- Schedule --}}
+            @if(in_array(Auth::user()->user_type, ['admin','staff']))
+            <li>
+                <a href="{{ route('schedules.index') }}"
+                   class="flex items-center gap-3 px-4 py-3 rounded-lg transition {{ isActive('schedules.*') }}">
+                    <span class="material-icons text-lg">Schedule</span>
+                </a>
+            </li>
+            @endif
+
+            {{-- Reservations --}}
+            @if(
+                Auth::user()->user_type === 'admin' ||
+                (Auth::user()->user_type === 'staff' && optional(Auth::user()->staffDetail)->role === 'cashier') ||
+                Auth::user()->user_type === 'customer'
+            )
+            <li>
+                <a href="{{ route('reservations.index') }}"
+                   class="flex items-center gap-3 px-4 py-3 rounded-lg transition {{ isActive('reservations.*') }}">
+                    <span class="material-icons text-lg">Reservations</span>
+                </a>
+            </li>
+            @endif
+
+            {{-- Tables & Orders --}}
+            @if(
+                Auth::user()->user_type === 'admin' ||
+                (Auth::user()->user_type === 'staff' && optional(Auth::user()->staffDetail)->role === 'cashier')
+            )
+            <li>
+                <a href="{{ route('tables.grid') }}"
+                   class="flex items-center gap-3 px-4 py-3 rounded-lg transition {{ isActive('tables.*') }}">
+                    <span class="material-icons text-lg">Tables</span>
+                </a>
+            </li>
+
+            <li>
+                <a href="{{ route('orders.index') }}"
+                   class="flex items-center gap-3 px-4 py-3 rounded-lg transition {{ isActive('orders.*') }}">
+                    <span class="material-icons text-lg">Orders</span>
+                </a>
+            </li>
+            @endif
+        </ul>
     </div>
 
-    <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
-        <div class="pt-2 pb-3 space-y-1">
-            <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                {{ __('Dashboard') }}
-            </x-responsive-nav-link>
+    {{-- BOTTOM PROFILE AREA --}}
+    <div class="border-t border-white/20 px-4 py-6 flex items-center gap-3">
+        <img src="{{ $avatar }}" class="h-10 w-10 rounded-full border border-white/30 object-cover" />
 
-            <x-responsive-nav-link :href="route('menu-items.index')" :active="request()->routeIs('menu-items.*')">
-                {{ __('Menu') }}
-            </x-responsive-nav-link>
+        <div>
+            <div class="font-semibold">{{ Auth::user()->name }}</div>
+            <div class="text-xs text-white/70">{{ $roleLabel }}</div>
 
-            @if(Auth::user()->user_type === 'admin')
-            <x-responsive-nav-link :href="route('staff.index')" :active="request()->routeIs('staff.*')">
-                {{ __('Staff') }}
-            </x-responsive-nav-link>
-
-            <x-responsive-nav-link :href="route('customer.index')" :active="request()->routeIs('customer.*')">
-                {{ __('Customer') }}
-            </x-responsive-nav-link>
-            @endif
-
-            @if(in_array(Auth::user()->user_type, ['admin', 'staff']))
-            <x-responsive-nav-link :href="route('inventory.index')" :active="request()->routeIs(['inventory.*', 'stockMovement.*'])">
-                {{ __('Inventory') }}
-            </x-responsive-nav-link>
-
-            <x-responsive-nav-link :href="route('schedules.index')" :active="request()->routeIs('schedules.*')">
-                {{ __('Schedule') }}
-            </x-responsive-nav-link>
-            @endif
-
-            @if(
-            Auth::user()->user_type === 'admin' ||
-            (Auth::user()->user_type === 'staff' && optional(Auth::user()->staffDetail)->role === 'cashier') ||
-            Auth::user()->user_type === 'customer'
-            )
-            <x-responsive-nav-link :href="route('reservations.index')" :active="request()->routeIs('reservations.*')">
-                {{ __('Reservations') }}
-            </x-responsive-nav-link>
-            @endif
-
-            @if(
-            Auth::user()->user_type === 'admin' ||
-            (Auth::user()->user_type === 'staff' && optional(Auth::user()->staffDetail)->role === 'cashier')
-            )
-            <x-responsive-nav-link :href="route('tables.grid')" :active="request()->routeIs('tables.*')">
-                {{ __('Tables') }}
-            </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('orders.index')" :active="request()->routeIs('orders.*')">
-                {{ __('Orders') }}
-            </x-responsive-nav-link>
-            @endif
-        </div>
-
-        <div class="pt-4 pb-1 border-t border-gray-200 dark:border-gray-600">
-            <div class="px-4">
-                <div class="flex items-center gap-2">
-                    <span class="px-2 py-0.5 text-xs font-semibold rounded-full {{ $roleClass }}">{{ $roleLabel }}</span>
-                    <img src="{{ $avatar }}" alt="{{ Auth::user()->name }}" class="h-10 w-10 rounded-full object-cover border border-gray-200 dark:border-gray-700" onerror="this.onerror=null;this.src='{{ $defaultAvatar }}';">
-                    <div class="font-medium text-base text-gray-800 dark:text-gray-200 truncate">
-                        {{ Auth::user()->name }}
-                    </div>
-                </div>
-                <div class="mt-1 ms-14 font-medium text-sm text-gray-500">{{ Auth::user()->email }}</div>
-            </div>
-
-            <div class="mt-3 space-y-1">
-                <x-responsive-nav-link :href="route('profile.edit')">
-                    {{ __('Profile') }}
-                </x-responsive-nav-link>
-
-                <form method="POST" action="{{ route('logout') }}">
-                    @csrf
-                    <x-responsive-nav-link :href="route('logout')" onclick="event.preventDefault(); this.closest('form').submit();">
-                        {{ __('Log Out') }}
-                    </x-responsive-nav-link>
-                </form>
-            </div>
+            {{-- Logout --}}
+            <form method="POST" action="{{ route('logout') }}" class="mt-2">
+                @csrf
+                <button type="submit"
+                        class="text-xs text-white/60 hover:text-white transition">
+                    Logout
+                </button>
+            </form>
         </div>
     </div>
 </nav>
