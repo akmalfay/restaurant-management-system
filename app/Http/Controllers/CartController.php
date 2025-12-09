@@ -39,7 +39,9 @@ class CartController extends Controller
     public function index()
     {
         $cart = session()->get('cart', []);
-        return view('cart.index', compact('cart'));
+        $user = Auth::user();
+        $customer = $user ? $user->customerDetail : null;
+        return view('cart.index', compact('cart', 'customer'));
     }
 
     /**
@@ -83,6 +85,7 @@ class CartController extends Controller
         // 1. Validasi Input
         $request->validate([
             'type' => 'required|in:dine_in,takeaway,delivery',
+            'points_to_redeem' => 'nullable|integer|min:0',
         ]);
 
         $cart = session()->get('cart', []);
@@ -106,7 +109,8 @@ class CartController extends Controller
             
             // Asumsi: User customer memiliki relasi customerDetail
             // Jika user adalah admin/staff, mungkin perlu penanganan khusus atau validasi
-            $customerId = $user->customerDetail ? $user->customerDetail->id : null;
+            $customer = $user->customerDetail ?? null;
+            $customerId = $customer ? $customer->id : null;
 
             if (!$customerId && $user->user_type === 'customer') {
                  // Fallback atau error jika data customer tidak lengkap
@@ -123,6 +127,32 @@ class CartController extends Controller
                 'created_at' => now(),
             ]);
 
+            // Handle loyalty points redemption (1 point = 10 rupiah)
+            $pointsToRedeem = intval($request->input('points_to_redeem', 0));
+            if ($pointsToRedeem > 0) {
+                if (! $customer) {
+                    throw new \Exception('Customer data not found for redemption.');
+                }
+
+                $available = intval($customer->points ?? 0);
+                $maxByTotal = (int) floor($totalAmount / 10);
+                $maxRedeemable = min($available, $maxByTotal);
+
+                if ($pointsToRedeem > $maxRedeemable) {
+                    throw new \Exception('Jumlah poin untuk ditukarkan melebihi yang diperbolehkan.');
+                }
+
+                // Deduct points from customer (this will create a LoyaltyPoint record)
+                $customer->deductPoints($pointsToRedeem, 'redeem', $order->id, "Redeemed {$pointsToRedeem} points for order #{$order->id}");
+
+                // Update order total and store points_redeemed
+                $discount = $pointsToRedeem * 10; // 10 rupiah per point
+                $newTotal = max(0, $totalAmount - $discount);
+                $order->update(['total' => $newTotal, 'points_redeemed' => $pointsToRedeem]);
+                // reflect change for any further logic
+                $totalAmount = $newTotal;
+            }
+
             // Simpan setiap item di keranjang ke tabel order_items
             foreach($cart as $id => $details) {
                 OrderItem::create([
@@ -138,9 +168,8 @@ class CartController extends Controller
 
             DB::commit();
 
-            // Redirect ke halaman history atau dashboard dengan pesan sukses
-            // Sesuaikan route redirect dengan kebutuhan Anda
-            return redirect()->route('dashboard')->with('success', 'Pesanan berhasil dibuat! Mohon tunggu konfirmasi.');
+            // Redirect ke halaman menu items dengan pesan sukses
+            return redirect()->route('menu-items.index')->with('success', 'Pesanan berhasil dibuat! Mohon tunggu konfirmasi.');
 
         } catch (\Exception $e) {
             DB::rollback();

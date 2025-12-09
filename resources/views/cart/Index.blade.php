@@ -110,6 +110,12 @@
                                 <div class="text-xl font-semibold">Rp {{ number_format($grandTotal, 0, ',', '.') }}</div>
                             </div>
 
+                            @php
+                                $availablePoints = optional($customer)->points ?? 0;
+                                $maxPointsByTotal = (int) floor($grandTotal / 10);
+                                $maxRedeemablePoints = min($availablePoints, $maxPointsByTotal);
+                            @endphp
+
                             <form action="{{ route('cart.checkout') }}" method="POST" class="mt-4">
                                 @csrf
                                 <label for="type" class="block text-sm font-medium text-gray-700 mb-2">Tipe Pesanan <span class="text-red-500">*</span></label>
@@ -120,6 +126,17 @@
                                     <option value="takeaway">🥡 Bawa Pulang (Takeaway)</option>
                                     <option value="delivery">🛵 Pesan Antar (Delivery)</option>
                                 </select>
+                                @if($availablePoints > 0)
+                                <div class="mb-3 p-3 border rounded bg-white">
+                                    <div class="text-sm text-gray-600">Poin Anda: <span class="font-semibold text-indigo-600">{{ $availablePoints }}</span></div>
+                                    <div class="text-xs text-gray-500">1 poin = Rp 10</div>
+
+                                    <div class="mt-2">
+                                        <label class="text-xs text-gray-700">Gunakan Poin (maks {{ $maxRedeemablePoints }})</label>
+                                        <input type="number" name="points_to_redeem" min="0" max="{{ $maxRedeemablePoints }}" value="0" class="w-full mt-1 rounded border-gray-300 px-2 py-1 text-sm" />
+                                    </div>
+                                </div>
+                                @endif
 
                                 <div class="flex items-center justify-between gap-3">
                                     <a href="{{ route('menu-items.index') }}" class="text-gray-600 hover:text-gray-900 underline text-sm">
