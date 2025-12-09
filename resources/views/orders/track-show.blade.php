@@ -53,6 +53,17 @@
             <div>Kode ambil: #{{ $order->id }}</div>
           @endif
         </div>
+
+        <div class="mt-4">
+          @if(in_array($order->type, ['takeaway','delivery']) && $order->status === 'ready' && ! $order->completed_at)
+            <form action="{{ route('orders.track.complete', $order) }}" method="POST">
+              @csrf
+              <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded" onclick="return confirm('Tandai pesanan ini selesai?')">Selesai</button>
+            </form>
+          @elseif($order->completed_at)
+            <div class="text-sm text-green-600">Pesanan ditandai selesai pada {{ optional($order->completed_at)->format('d M Y H:i') }}</div>
+          @endif
+        </div>
       </div>
     </div>
   </div>

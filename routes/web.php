@@ -113,6 +113,7 @@ Route::middleware('auth')->group(function () {
     // Customer order tracking (customer only)
     Route::get('/my-orders', [OrderController::class, 'track'])->name('orders.track');
     Route::get('/my-orders/{order}', [OrderController::class, 'trackShow'])->name('orders.track.show');
+    Route::post('/my-orders/{order}/complete', [OrderController::class, 'complete'])->name('orders.track.complete');
     // Keranjang
     Route::post('/cart/add/{id}', [CartController::class, 'addToCart'])->name('cart.add');
     Route::post('/cart/update/{id}', [CartController::class, 'update'])->name('cart.update');

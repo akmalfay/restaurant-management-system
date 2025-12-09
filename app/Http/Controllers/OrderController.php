@@ -67,6 +67,37 @@ class OrderController extends Controller
     return view('orders.track-show', compact('order'));
   }
 
+  /**
+   * Customer marks order as completed (delivery/takeaway) when received
+   */
+  public function complete(Request $request, Order $order)
+  {
+    $user = Auth::user();
+    if (! $user) return redirect()->route('login');
+
+    $customer = $user->customerDetail;
+    if (! $customer || $order->customer_id !== $customer->id) {
+      abort(403);
+    }
+
+    // Only allow for takeaway or delivery, and when order is ready
+    if (! in_array($order->type, ['takeaway', 'delivery'])) {
+      return back()->with('error', 'Hanya pesanan takeaway atau delivery yang dapat diselesaikan oleh customer.');
+    }
+
+    if ($order->status !== 'ready') {
+      return back()->with('error', 'Pesanan belum siap untuk diselesaikan.');
+    }
+
+    if ($order->completed_at) {
+      return back()->with('success', 'Pesanan sudah ditandai selesai.');
+    }
+
+    $order->update(['completed_at' => now()]);
+
+    return back()->with('success', 'Terima kasih — pesanan telah ditandai selesai.');
+  }
+
   public function index(Request $request)
   {
     if (! $this->isAdminOrCashier()) abort(403);

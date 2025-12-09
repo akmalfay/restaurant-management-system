@@ -62,7 +62,12 @@
                 <div class="text-lg font-semibold">Rp {{ number_format($order->total,0,',','.') }}</div>
                 <div class="mt-3 flex gap-2 justify-end">
                   <a href="{{ route('orders.track.show', $order) }}" class="px-3 py-2 bg-gray-100 rounded">Detail</a>
-                  {{-- Optionally add re-order or contact support buttons here --}}
+                  @if(in_array($order->type, ['takeaway','delivery']) && $order->status === 'ready' && ! $order->completed_at)
+                    <form action="{{ route('orders.track.complete', $order) }}" method="POST" class="inline">
+                      @csrf
+                      <button type="submit" class="px-3 py-2 bg-green-600 text-white rounded" onclick="return confirm('Tandai pesanan ini selesai?')">Selesai</button>
+                    </form>
+                  @endif
                 </div>
               </div>
             </div>

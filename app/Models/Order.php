@@ -16,6 +16,7 @@ class Order extends Model
     'status',
     'points_redeemed',
     'order_time',
+    'completed_at',
   ];
 
   protected $casts = [
