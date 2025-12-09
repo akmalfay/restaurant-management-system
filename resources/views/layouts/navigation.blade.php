@@ -63,6 +63,16 @@
                 </a>
             </li>
 
+            {{-- Tracking (Customer only) --}}
+            @if(Auth::user()->user_type === 'customer')
+            <li>
+                <a href="{{ route('orders.track') }}"
+                   class="flex items-center gap-3 px-4 py-3 rounded-lg transition {{ isActive('orders.track') }}">
+                    <span class="material-icons text-lg">Lacak pesanan</span>
+                </a>
+            </li>
+            @endif
+
             {{-- Staff (Admin only) --}}
             @if(Auth::user()->user_type === "admin")
             <li>

@@ -109,6 +109,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
     Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show'); // returns JSON for popover
     Route::patch('/orders/{order}/status', [OrderController::class, 'updateStatus'])->name('orders.updateStatus');
+    
+    // Customer order tracking (customer only)
+    Route::get('/my-orders', [OrderController::class, 'track'])->name('orders.track');
+    Route::get('/my-orders/{order}', [OrderController::class, 'trackShow'])->name('orders.track.show');
     // Keranjang
     Route::post('/cart/add/{id}', [CartController::class, 'addToCart'])->name('cart.add');
     Route::post('/cart/update/{id}', [CartController::class, 'update'])->name('cart.update');

@@ -14,6 +14,59 @@ class OrderController extends Controller
     return $u && ($u->user_type === 'admin' || ($u->user_type === 'staff' && optional($u->staffDetail)->role === 'cashier'));
   }
 
+  /**
+   * Customer-facing: list orders for the authenticated customer (takeaway & delivery prioritized)
+   */
+  public function track(Request $request)
+  {
+    $user = Auth::user();
+    if (! $user) return redirect()->route('login');
+
+    // ensure customer detail exists
+    $customer = $user->customerDetail;
+    if (! $customer) {
+      return redirect()->back()->with('error', 'Profil customer tidak ditemukan.');
+    }
+
+    $q = trim($request->query('q', ''));
+
+    $query = Order::with('orderItems.menuItem')
+      ->where('customer_id', $customer->id)
+      ->whereIn('type', ['takeaway', 'delivery'])
+      ->orderBy('created_at', 'desc');
+
+    if ($q !== '') {
+      $query->where(function ($wr) use ($q) {
+        if (is_numeric($q)) {
+          $wr->where('id', intval($q));
+        }
+        $wr->orWhere('id', 'like', "%{$q}%");
+      });
+    }
+
+    $orders = $query->paginate(12)->appends($request->query());
+
+    return view('orders.track', compact('orders', 'q'));
+  }
+
+  /**
+   * Customer-facing: show one order details (only owner)
+   */
+  public function trackShow(Order $order)
+  {
+    $user = Auth::user();
+    if (! $user) return redirect()->route('login');
+
+    $customer = $user->customerDetail;
+    if (! $customer || $order->customer_id !== $customer->id) {
+      abort(403);
+    }
+
+    $order->loadMissing('orderItems.menuItem');
+
+    return view('orders.track-show', compact('order'));
+  }
+
   public function index(Request $request)
   {
     if (! $this->isAdminOrCashier()) abort(403);
