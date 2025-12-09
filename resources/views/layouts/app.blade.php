@@ -11,31 +11,72 @@
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
-    <!-- Scripts -->
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-</head>
+        <!-- Memuat Tailwind CSS via CDN -->
+        <script src="https://cdn.tailwindcss.com"></script>
 
-<body class="font-sans antialiased bg-[#F7F4ED]">
-    <div class="min-h-screen flex">
+        <style>
+            body {
+                font-family: 'Figtree', sans-serif;
+            }
+        </style>
+        
+        <!-- Konfigurasi Tailwind untuk menambahkan warna 'amber' -->
+        <script>
+            tailwind.config = {
+                darkMode: 'media', // atau 'class'
+                theme: {
+                    extend: {
+                        fontFamily: {
+                            sans: ['Figtree', 'ui-sans-serif', 'system-ui'],
+                        },
+                        colors: {
+                            amber: {
+                                50: '#fffbeb',
+                                100: '#fef3c7',
+                                200: '#fde68a',
+                                300: '#fcd34d',
+                                400: '#fbbf24',
+                                500: '#f59e0b',
+                                600: '#d97706',
+                                700: '#b45309',
+                                800: '#92400e',
+                                900: '#78350f',
+                                950: '#451a03',
+                            }
+                        }
+                    }
+                }
+            }
+        </script>
 
-        {{-- Sidebar --}}
-        <aside class="w-64 bg-[#0F3D3E] text-white flex-shrink-0">
-            @include('layouts.navigation')
-        </aside>
+        <!-- Scripts (Vite) - Dibiarkan untuk jika Anda beralih kembali -->
+        @vite(['resources/css/app.css', 'resources/js/app.js'])
+    </head>
+    <body class="font-sans antialiased">
+        {{-- Mengganti latar belakang agar seragam dengan landing page --}}
+        <div class="flex min-h-screen">
 
-        {{-- Content Area --}}
-        <div class="flex-1">
-            {{-- Page Header --}}
-            @isset($header)
-                <header class="px-8 py-6 border-b border-[#E5E5E5] bg-white">
-                    {{ $header }}
-                </header>
-            @endisset
+            {{-- SIDEBAR --}}
+            <aside class="w-64 bg-[#0F3D3E] text-white flex-shrink-0">
+                @include('layouts.navigation')
+            </aside>
 
-            {{-- Page Content --}}
-            <main class="p-8">
-                {{ $slot }}
-            </main>
+            {{-- MAIN CONTENT SECTION --}}
+            <div class="flex-1 flex flex-col">
+
+                {{-- HEADER --}}
+                @isset($header)
+                    <header class="bg-white shadow px-8 py-6 border-b border-gray-200">
+                        {{ $header }}
+                    </header>
+                @endisset
+
+                {{-- PAGE CONTENT --}}
+                <main class="p-8">
+                    {{ $slot }}
+                </main>
+            </div>
+
         </div>
     </div>
 </body>
