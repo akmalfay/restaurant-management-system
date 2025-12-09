@@ -18,7 +18,13 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+use Illuminate\Support\Facades\Auth;
+
 Route::get('/dashboard', function () {
+    $user = Auth::user();
+    if (! $user || ! in_array($user->user_type, ['admin','staff'])) {
+        abort(403);
+    }
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 

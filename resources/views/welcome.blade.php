@@ -72,8 +72,8 @@
                 {{-- Logika Tautan Otentikasi Laravel --}}
                 @if (Route::has('login'))
                     @auth
-                        <a href="{{ url('/dashboard') }}" class="px-5 py-2 bg-amber-600 text-white rounded-lg font-medium hover:bg-amber-700 transition-colors shadow-sm">
-                            Dashboard
+                        <a href="{{ route('menu-items.index') }}" class="px-5 py-2 bg-amber-600 text-white rounded-lg font-medium hover:bg-amber-700 transition-colors shadow-sm">
+                            Masuk
                         </a>
                     @else
                         <a href="{{ route('login') }}" class="px-5 py-2 bg-amber-600 text-white rounded-lg font-medium hover:bg-amber-700 transition-colors shadow-sm">
@@ -114,8 +114,8 @@
                 {{-- Logika Tautan Otentikasi Laravel (Mobile) --}}
                 @if (Route::has('login'))
                     @auth
-                        <a href="{{ url('/dashboard') }}" class="mt-2 w-full px-5 py-3 bg-amber-600 text-white text-center rounded-lg font-medium hover:bg-amber-700 transition-colors shadow-sm">
-                            Dashboard
+                        <a href="{{ route('menu-items.index') }}" class="mt-2 w-full px-5 py-3 bg-amber-600 text-white text-center rounded-lg font-medium hover:bg-amber-700 transition-colors shadow-sm">
+                            Masuk
                         </a>
                     @else
                         <a href="{{ route('login') }}" class="mt-2 w-full px-5 py-3 bg-amber-600 text-white text-center rounded-lg font-medium hover:bg-amber-700 transition-colors shadow-sm">

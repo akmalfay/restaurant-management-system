@@ -39,13 +39,15 @@
                 }
             @endphp
 
-            {{-- Dashboard --}}
+            {{-- Dashboard (admin & staff only) --}}
+            @if(in_array(Auth::user()->user_type, ['admin','staff']))
             <li>
                 <a href="{{ route('dashboard') }}"
                    class="flex items-center gap-3 px-4 py-3 rounded-lg transition {{ isActive('dashboard') }}">
                     <span class="material-icons text-lg">Dashboard</span>
                 </a>
             </li>
+            @endif
 
             {{-- Menu Items --}}
             <li>

@@ -28,7 +28,15 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->intended(route('dashboard', absolute: false));
+        $user = Auth::user();
+        // If the user is a customer, redirect to menu page; otherwise go to dashboard
+        if ($user && $user->user_type === 'customer') {
+            $destination = route('menu-items.index');
+        } else {
+            $destination = route('dashboard');
+        }
+
+        return redirect()->intended($destination);
     }
 
     /**
