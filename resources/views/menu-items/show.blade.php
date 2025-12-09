@@ -94,9 +94,14 @@
                                 style="height: 50px; font-weight: bold;">
                       </div>
 
-                      <button type="submit" class="btn btn-success btn-lg px-4 shadow" 
-                              style="height: 50px; border-radius: 50px; font-weight: 600;">
-                          <i class="fas fa-shopping-cart me-2"></i> Beli Sekarang
+                      <button type="submit" name="intent" value="add" class="btn btn-outline-primary btn-lg px-4"
+                          style="height: 50px; border-radius: 50px; font-weight: 600;">
+                        <i class="fas fa-cart-plus me-2"></i> Tambahkan ke Keranjang
+                      </button>
+
+                      <button type="submit" name="intent" value="buy" class="btn btn-success btn-lg px-4 shadow" 
+                          style="height: 50px; border-radius: 50px; font-weight: 600;">
+                        <i class="fas fa-shopping-cart me-2"></i> Beli Sekarang
                       </button>
                   </div>
               </form>

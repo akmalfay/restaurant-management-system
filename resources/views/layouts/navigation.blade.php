@@ -55,6 +55,14 @@
                 </a>
             </li>
 
+            {{-- Cart --}}
+            <li>
+                <a href="{{ route('cart.index') }}"
+                   class="flex items-center gap-3 px-4 py-3 rounded-lg transition {{ isActive('cart.*') }}">
+                    <span class="material-icons text-lg">keranjang</span>
+                </a>
+            </li>
+
             {{-- Staff (Admin only) --}}
             @if(Auth::user()->user_type === "admin")
             <li>

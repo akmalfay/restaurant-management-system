@@ -109,8 +109,14 @@ Route::middleware('auth')->group(function () {
     Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
     Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show'); // returns JSON for popover
     Route::patch('/orders/{order}/status', [OrderController::class, 'updateStatus'])->name('orders.updateStatus');
-
+    // Keranjang
     Route::post('/cart/add/{id}', [CartController::class, 'addToCart'])->name('cart.add');
+    Route::post('/cart/update/{id}', [CartController::class, 'update'])->name('cart.update');
+    Route::post('/cart/remove/{id}', [CartController::class, 'remove'])->name('cart.remove');
+    // Route untuk melihat keranjang
+    Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+    // Route untuk memproses checkout
+    Route::post('/cart/checkout', [CartController::class, 'checkout'])->name('cart.checkout');
 });
 
 require __DIR__ . '/auth.php';
