@@ -52,32 +52,52 @@
         <!-- Scripts (Vite) - Dibiarkan untuk jika Anda beralih kembali -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="font-sans bg-[#F7F4ED] antialiased">
-        {{-- Mengganti latar belakang agar seragam dengan landing page --}}
+    <body class="font-sans bg-[#F7F4ED] antialiased" x-data="{ openSidebar: false }">
+
         <div class="flex min-h-screen">
 
             {{-- SIDEBAR --}}
-            <aside class="w-64 bg-[#0F3D3E] text-white flex-shrink-0">
+            <aside class="w-64 bg-[#0F3D3E] text-white flex-shrink-0 
+                        fixed inset-y-0 left-0 transform transition-all duration-300 z-40
+                        md:relative md:translate-x-0"
+                :class="openSidebar ? 'translate-x-0' : '-translate-x-full'">
+
                 @include('layouts.navigation')
             </aside>
 
-            {{-- MAIN CONTENT SECTION --}}
+            {{-- OVERLAY (Mobile Only) --}}
+            <div 
+                class="fixed inset-0 bg-black/40 z-30 md:hidden transition-opacity"
+                x-show="openSidebar"
+                @click="openSidebar = false"
+                x-transition.opacity>
+            </div>
+
+            {{-- MAIN CONTENT --}}
             <div class="flex-1 flex flex-col">
 
                 {{-- HEADER --}}
-                @isset($header)
-                    <header class="bg-white shadow px-8 py-6 border-b border-gray-200">
-                        {{ $header }}
-                    </header>
-                @endisset
+                <header class="bg-white shadow px-8 py-4 border-b border-gray-200 flex items-center justify-between">
+                    
+                    {{-- Mobile Menu Button --}}
+                    <button 
+                        class="md:hidden p-2 rounded bg-gray-100 border"
+                        @click="openSidebar = true">
+                        <span class="material-icons">menu</span>
+                    </button>
 
-                {{-- PAGE CONTENT --}}
+                    {{-- Title (Same as Before) --}}
+                    <div class="flex-1 px-2">
+                        {{ $header ?? '' }}
+                    </div>
+                </header>
+
+                {{-- CONTENT --}}
                 <main class="p-8">
                     {{ $slot }}
                 </main>
             </div>
 
         </div>
-    </div>
-</body>
+    </body>
 </html>
