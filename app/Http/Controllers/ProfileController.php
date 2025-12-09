@@ -22,6 +22,26 @@ class ProfileController extends Controller
     }
 
     /**
+     * Show profile page with loyalty points and history.
+     */
+    public function show(Request $request)
+    {
+        $user = $request->user();
+        $customer = $user->customerDetail;
+
+        $loyaltyPoints = null;
+        if ($customer) {
+            $loyaltyPoints = $customer->loyaltyPoints()->orderBy('created_at', 'desc')->get();
+        }
+
+        return view('profile.show', [
+            'user' => $user,
+            'customer' => $customer,
+            'loyaltyPoints' => $loyaltyPoints,
+        ]);
+    }
+
+    /**
      * Update the user's profile information.
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse

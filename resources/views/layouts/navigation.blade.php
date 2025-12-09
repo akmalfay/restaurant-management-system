@@ -153,21 +153,19 @@
     </div>
 
     {{-- BOTTOM PROFILE AREA --}}
-    <div class="border-t border-white/20 px-4 py-6 flex items-center gap-3">
+    <a href="{{ route('profile.show') }}" class="border-t border-white/20 px-4 py-6 flex items-center gap-3 hover:bg-white/5 transition">
         <img src="{{ $avatar }}" class="h-10 w-10 rounded-full border border-white/30 object-cover" />
 
         <div>
             <div class="font-semibold">{{ Auth::user()->name }}</div>
             <div class="text-xs text-white/70">{{ $roleLabel }}</div>
+        </div>
 
-            {{-- Logout --}}
-            <form method="POST" action="{{ route('logout') }}" class="mt-2">
+        <div class="ml-auto">
+            <form method="POST" action="{{ route('logout') }}">
                 @csrf
-                <button type="submit"
-                        class="text-xs text-white/60 hover:text-white transition">
-                    Logout
-                </button>
+                <button type="submit" class="text-xs text-white/60 hover:text-white transition">Logout</button>
             </form>
         </div>
-    </div>
+    </a>
 </nav>
