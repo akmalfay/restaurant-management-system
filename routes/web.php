@@ -90,6 +90,7 @@ Route::middleware('auth')->group(function () {
 
     // Reservations (ensure these exist)
     Route::get('/reservations', [ReservationController::class, 'index'])->name('reservations.index');
+    Route::get('/reservations/my', [ReservationController::class, 'myReservations'])->name('reservations.my');
     Route::post('/reservations', [ReservationController::class, 'store'])->name('reservations.store');
     Route::patch('/reservations/{reservation}/cancel', [ReservationController::class, 'cancel'])->name('reservations.cancel');
     Route::patch('/reservations/{reservation}/complete', [ReservationController::class, 'complete'])->name('reservations.complete');

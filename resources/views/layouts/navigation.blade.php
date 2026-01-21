@@ -124,8 +124,18 @@
             )
             <li>
                 <a href="{{ route('reservations.index') }}"
-                   class="flex items-center gap-3 px-4 py-3 rounded-lg transition {{ isActive('reservations.*') }}">
+                   class="flex items-center gap-3 px-4 py-3 rounded-lg transition {{ isActive('reservations.index') }}">
                     <span class="material-icons text-lg">Reservations</span>
+                </a>
+            </li>
+            @endif
+
+            {{-- My Reservations (Customer only) --}}
+            @if(Auth::user()->user_type === 'customer')
+            <li>
+                <a href="{{ route('reservations.my') }}"
+                   class="flex items-center gap-3 px-4 py-3 rounded-lg transition {{ isActive('reservations.my') }}">
+                    <span class="material-icons text-lg">My Reservations</span>
                 </a>
             </li>
             @endif

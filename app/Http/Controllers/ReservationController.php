@@ -245,4 +245,39 @@ class ReservationController extends Controller
       'canManage' => $this->canManage(),
     ]);
   }
+
+  public function myReservations(Request $request)
+  {
+    $user = Auth::user();
+    if ($user->user_type !== 'customer') abort(403);
+
+    // Get customer detail
+    $customerDetail = $user->customerDetail;
+    if (!$customerDetail) {
+      return view('reservations.my', ['reservations' => [], 'filter' => 'all']);
+    }
+
+    $filter = $request->query('filter', 'all');
+    if (!in_array($filter, ['all', 'upcoming', 'ongoing', 'finished'])) {
+      $filter = 'all';
+    }
+
+    // Get reservations that have orders from this customer
+    $query = Reservation::whereHas('orders', function ($q) use ($customerDetail) {
+      $q->where('customer_id', $customerDetail->id);
+    })->with(['table', 'orders' => function ($q) use ($customerDetail) {
+      $q->where('customer_id', $customerDetail->id)->with('orderItems.menuItem');
+    }])->orderBy('reservation_date', 'desc')->orderBy('start_time', 'desc');
+
+    if ($filter !== 'all') {
+      $query->where('status', $filter);
+    }
+
+    $reservations = $query->paginate(10);
+
+    return view('reservations.my', [
+      'reservations' => $reservations,
+      'filter' => $filter,
+    ]);
+  }
 }
