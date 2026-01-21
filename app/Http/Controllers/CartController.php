@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\MenuItem;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\Reservation;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -83,10 +84,17 @@ class CartController extends Controller
     public function checkout(Request $request)
     {
         // 1. Validasi Input
-        $request->validate([
+        $rules = [
             'type' => 'required|in:dine_in,takeaway,delivery',
             'points_to_redeem' => 'nullable|integer|min:0',
-        ]);
+        ];
+
+        // Untuk dine_in, wajib ada reservation_id
+        if ($request->type === 'dine_in') {
+            $rules['reservation_id'] = 'required|exists:reservations,id';
+        }
+
+        $request->validate($rules);
 
         $cart = session()->get('cart', []);
 
@@ -116,10 +124,28 @@ class CartController extends Controller
                  // Fallback atau error jika data customer tidak lengkap
                  throw new \Exception('Data profil customer tidak ditemukan.');
             }
+
+            // Validasi reservation jika dine_in
+            $reservationId = null;
+            if ($request->type === 'dine_in') {
+                $reservationId = $request->input('reservation_id');
+                $reservation = Reservation::findOrFail($reservationId);
+                
+                // Validasi bahwa reservation untuk hari ini atau masa depan
+                if ($reservation->reservation_date < now()->toDateString()) {
+                    throw new \Exception('Reservasi sudah lewat.');
+                }
+
+                // Validasi bahwa customer memiliki order di reservation ini (atau staff/admin)
+                if ($user->user_type === 'customer' && !$customerId) {
+                    throw new \Exception('Customer tidak valid untuk reservation ini.');
+                }
+            }
             
             // Buat Order Utama
             $order = Order::create([
                 'customer_id' => $customerId, 
+                'reservation_id' => $reservationId,
                 'type' => $request->type,     // dine_in, takeaway, delivery
                 'status' => 'pending',        // Default status awal
                 'total' => $totalAmount,

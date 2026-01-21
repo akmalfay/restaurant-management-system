@@ -11,6 +11,7 @@ class Order extends Model
 
   protected $fillable = [
     'customer_id',
+    'reservation_id',
     'type',
     'total',
     'status',
@@ -36,9 +37,9 @@ class Order extends Model
     return $this->hasMany(OrderItem::class);
   }
 
-  // Relasi ke Reservation (1 order bisa punya 1 reservasi)
+  // Relasi ke Reservation (order harus punya reservation)
   public function reservation()
   {
-    return $this->hasOne(Reservation::class);
+    return $this->belongsTo(Reservation::class);
   }
 }

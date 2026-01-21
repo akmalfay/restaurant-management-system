@@ -78,12 +78,13 @@ class TableController extends Controller
 
     // Prepare affected list (readable)
     $affected = $futureReservations->map(function ($r) {
+      $firstOrder = $r->orders->first();
       return [
         'id' => $r->id,
         'date' => Carbon::parse($r->reservation_date)->format('d M Y'),
         'time' => substr($r->start_time, 0, 5),
-        'order_id' => $r->order_id,
-        'customer' => optional($r->order->customer->user)->name ?? 'Walk-in',
+        'order_id' => $firstOrder ? $firstOrder->id : null,
+        'customer' => $firstOrder ? optional($firstOrder->customer)->user->name ?? 'Walk-in' : 'Walk-in',
       ];
     })->toArray();
 

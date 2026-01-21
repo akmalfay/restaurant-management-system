@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\CustomerDetail;
 use App\Models\Order;
+use App\Models\Reservation;
 use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 
@@ -20,6 +21,7 @@ class OrderSeeder extends Seeder
     $statuses = ['pending', 'preparing', 'ready', 'cancel'];
 
     $orders = [];
+    $reservations = Reservation::all();
 
     // create 120 orders across past 10 days and next 3 days
     $now = Carbon::now();
@@ -30,9 +32,18 @@ class OrderSeeder extends Seeder
       // make cancel relatively uncommon (~6%)
       $status = (random_int(1, 100) <= 6) ? 'cancel' : $statuses[array_rand(['pending', 'preparing', 'ready'])];
 
+      $type = $types[array_rand($types)];
+      
+      // Untuk dine_in, random assign reservation jika ada
+      $reservationId = null;
+      if ($type === 'dine_in' && !$reservations->isEmpty()) {
+        $reservationId = random_int(1, 100) <= 50 ? $reservations->random()->id : null; // 50% chance
+      }
+
       $orders[] = [
         'customer_id' => $cust ? $cust->id : null,
-        'type' => $types[array_rand($types)],
+        'reservation_id' => $reservationId,
+        'type' => $type,
         'total' => 0,
         'status' => $status,
         'points_redeemed' => null,

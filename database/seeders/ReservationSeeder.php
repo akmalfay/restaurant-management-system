@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\Order;
 use App\Models\Reservation;
 use App\Models\Table;
 use Carbon\Carbon;
@@ -15,12 +14,6 @@ class ReservationSeeder extends Seeder
    */
   public function run(): void
   {
-    $orders = Order::whereNotNull('customer_id')->inRandomOrder()->get();
-    if ($orders->isEmpty()) {
-      $this->command->warn('ReservationSeeder: Tidak ada orders. Seed Order dulu.');
-      return;
-    }
-
     $tables = Table::orderBy('id')->get();
     if ($tables->isEmpty()) {
       $this->command->warn('ReservationSeeder: Tidak ada tables. Seed Table dulu.');
@@ -31,7 +24,6 @@ class ReservationSeeder extends Seeder
     $endDate   = Carbon::today()->addDays(30);
 
     $reservations = []; // keyed to avoid duplicates
-    $orderIndex = 0;
     $stats = ['upcoming' => 0, 'ongoing' => 0, 'finished' => 0];
 
     $current = $startDate->copy();
@@ -75,14 +67,10 @@ class ReservationSeeder extends Seeder
             $status = 'upcoming';
           }
 
-          $order = $orders[$orderIndex % $orders->count()];
-          $orderIndex++;
-
           $createdAt = $current->copy()->subDays(random_int(1, 10))->setTime(random_int(8, 20), random_int(0, 59));
           if ($createdAt->isFuture()) $createdAt = Carbon::now()->subHours(random_int(1, 48));
 
           $reservations[$key] = [
-            'order_id' => $order->id,
             'table_id' => $table->id,
             'reservation_date' => $current->toDateString(),
             'start_time' => $start->format('H:i:s'),

@@ -74,17 +74,13 @@
                 </span>
               </div>
               <div class="flex items-center justify-between text-xs">
-                <span class="text-gray-500 dark:text-gray-400">Tamu:</span>
-                <span class="text-gray-800 dark:text-gray-200">{{ $r->guests ?? '-' }}</span>
-              </div>
-              <div class="flex items-center justify-between text-xs">
-                <span class="text-gray-500 dark:text-gray-400">Order ID:</span>
-                <span class="text-gray-800 dark:text-gray-200">#{{ $r->order_id }}</span>
+                <span class="text-gray-500 dark:text-gray-400">Orders:</span>
+                <span class="text-gray-800 dark:text-gray-200">{{ $r->orders->count() }}</span>
               </div>
 
               {{-- Jika user owner atau admin/cashier tampilkan tombol batal --}}
               @php $currentUserId = auth()->id(); @endphp
-              @php $isOwner = optional($r->order)->customer_id === $currentUserId; @endphp
+              @php $isOwner = $r->orders->whereIn('customer_id', [$currentUserId])->count() > 0; @endphp
 
               @if(($canManage || ($user->user_type==='customer' && $isOwner)) && in_array($r->status, ['pending','confirmed']))
               <div class="mt-3 flex items-center gap-2">

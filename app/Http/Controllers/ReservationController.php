@@ -78,7 +78,7 @@ class ReservationController extends Controller
 
     // Ambil SEMUA reservasi di tanggal tersebut (tidak ada limit)
     $reservations = Reservation::where('reservation_date', $selectedDate->toDateString())
-      ->with('order.customer.user')
+      ->with('orders.customer.user')
       ->orderBy('created_at', 'asc')
       ->get();
 
@@ -137,7 +137,6 @@ class ReservationController extends Controller
       'table_id' => ['required', 'exists:tables,id'],
       'date' => ['required', 'date', 'after_or_equal:today'],
       'hour' => ['required', 'integer', 'between:10,23'],
-      'order_id' => ['nullable', 'exists:orders,id'],
     ]);
 
     // Guard: if table is in maintenance do not allow booking
@@ -149,16 +148,6 @@ class ReservationController extends Controller
     $slotDate = Carbon::parse($validated['date'])->toDateString();
     $start = Carbon::parse("$slotDate {$validated['hour']}:00:00");
     $end = (clone $start)->addHour();
-
-    // If order_id not provided and customer, try to find latest order for this customer
-    $orderId = $validated['order_id'] ?? null;
-    if (!$orderId && $user->user_type === 'customer') {
-      $order = Order::where('customer_id', $user->id)->latest()->first();
-      if (!$order) {
-        return back()->withErrors(['order' => 'Tidak ada order terkait. Silakan buat order terlebih dahulu.']);
-      }
-      $orderId = $order->id;
-    }
 
     // Decide status by time: upcoming / ongoing (allow booking current hour) 
     $now = Carbon::now();
@@ -183,7 +172,6 @@ class ReservationController extends Controller
       }
 
       Reservation::create([
-        'order_id' => $orderId,
         'table_id' => $validated['table_id'],
         'reservation_date' => $slotDate,
         'start_time' => $start->format('H:i:s'),
@@ -197,15 +185,15 @@ class ReservationController extends Controller
       return back()->withErrors(['slot' => 'Gagal membuat reservasi — slot kemungkinan sudah diambil. Silakan coba lagi.']);
     }
 
-    return back()->with('status', 'Reservasi berhasil dibuat.');
+    return back()->with('status', 'Reservasi berhasil dibuat. Silakan lanjutkan dengan membuat pesanan.');
   }
 
   public function cancel(Reservation $reservation)
   {
     $user = Auth::user();
 
-    // Allow cashier/admin OR reservation owner (customer) to cancel
-    $isOwner = optional($reservation->order)->customer_id === $user->id;
+    // Allow cashier/admin OR reservation owner (any customer with order on this reservation) to cancel
+    $isOwner = $reservation->orders()->where('customer_id', $user->id)->exists();
 
     if (!$this->canManage() && !$isOwner) abort(403);
 

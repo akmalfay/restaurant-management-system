@@ -13,9 +13,9 @@ class TableSeeder extends Seeder
   public function run(): void
   {
     $categories = [
-      'VIP' => ['count' => 10, 'capacity' => 4],
-      'Terrace' => ['count' => 10, 'capacity' => 4],
-      'Outdoor' => ['count' => 10, 'capacity' => 3],
+      'VIP' => ['count' => 4, 'capacity' => 4],
+      'Terrace' => ['count' => 5, 'capacity' => 4],
+      'Outdoor' => ['count' => 5, 'capacity' => 3],
       'Indoor' => ['count' => 10, 'capacity' => 2],
     ];
 

@@ -10,7 +10,6 @@ class Reservation extends Model
   use HasFactory;
 
   protected $fillable = [
-    'order_id',
     'table_id',
     'reservation_date',
     'start_time',
@@ -24,10 +23,10 @@ class Reservation extends Model
     'end_time' => 'datetime:H:i:s',
   ];
 
-  // Relasi ke Order
-  public function order()
+  // Relasi ke Orders (satu reservasi bisa punya banyak orders)
+  public function orders()
   {
-    return $this->belongsTo(Order::class);
+    return $this->hasMany(Order::class);
   }
 
   // Relasi ke Table

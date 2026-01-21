@@ -29,12 +29,12 @@ class UserSeeder extends Seeder
 
     // Generate 10 staff dengan factory
     User::factory()
-      ->count(10)->staff()
+      ->count(5)->staff()
       ->create();
 
     // Generate 20 customers dengan factory
     User::factory()
-      ->count(20)
+      ->count(10)
       ->create();
   }
 }

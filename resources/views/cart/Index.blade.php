@@ -120,12 +120,47 @@
                                 @csrf
                                 <label for="type" class="block text-sm font-medium text-gray-700 mb-2">Tipe Pesanan <span class="text-red-500">*</span></label>
                                 <select name="type" id="type" required
-                                    class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm mb-4">
+                                    class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm mb-4"
+                                    onchange="document.getElementById('reservation-group').style.display = this.value === 'dine_in' ? 'block' : 'none'">
                                     <option value="" disabled selected>-- Pilih Metode --</option>
                                     <option value="dine_in">🍽️ Makan di Tempat (Dine In)</option>
                                     <option value="takeaway">🥡 Bawa Pulang (Takeaway)</option>
                                     <option value="delivery">🛵 Pesan Antar (Delivery)</option>
                                 </select>
+
+                                {{-- Reservation selector untuk dine_in --}}
+                                <div id="reservation-group" style="display: none;" class="mb-4 p-3 border rounded bg-blue-50">
+                                    <label for="reservation_id" class="block text-sm font-medium text-gray-700 mb-2">
+                                        Pilih Reservasi <span class="text-red-500">*</span>
+                                    </label>
+                                    @php
+                                        $today = \Carbon\Carbon::today()->toDateString();
+                                        $customerDetail = auth()->user()->customerDetail;
+                                        // Ambil semua reservasi di hari ini dan masa depan yang belum finished
+                                        $userReservations = $customerDetail ? 
+                                            \App\Models\Reservation::where('reservation_date', '>=', $today)
+                                                ->whereIn('status', ['upcoming', 'ongoing'])
+                                                ->with(['table', 'orders'])
+                                                ->orderBy('reservation_date', 'asc')
+                                                ->orderBy('start_time', 'asc')
+                                                ->get()
+                                            : collect([]);
+                                    @endphp
+                                    <select name="reservation_id" id="reservation_id" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                                        <option value="">-- Pilih Reservasi --</option>
+                                        @forelse($userReservations as $res)
+                                            <option value="{{ $res->id }}">
+                                                {{ $res->table->name }} - {{ \Carbon\Carbon::parse($res->reservation_date)->format('d M Y') }} 
+                                                {{ substr($res->start_time, 0, 5) }}-{{ substr($res->end_time, 0, 5) }}
+                                                (Status: {{ ucfirst($res->status) }})
+                                            </option>
+                                        @empty
+                                            <option disabled>Tidak ada reservasi tersedia</option>
+                                        @endforelse
+                                    </select>
+                                    <p class="text-xs text-gray-600 mt-1">Pilih meja yang sudah Anda booking sebelumnya. Jika belum ada, silakan <a href="{{ route('reservations.index') }}" class="text-indigo-600 hover:underline">booking meja dulu</a></p>
+                                </div>
+
                                 @if($availablePoints > 0)
                                 <div class="mb-3 p-3 border rounded bg-white">
                                     <div class="text-sm text-gray-600">Poin Anda: <span class="font-semibold text-indigo-600">{{ $availablePoints }}</span></div>
